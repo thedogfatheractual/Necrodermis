@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/btop.sh
-# Extracted from monolith install-OGSHELL.sh
 # Component: install_btop
 
 install_btop() {
-    print_section "BTOP  //  CANOPTEK PROCESS MONITOR"
-    backup_and_install "$SCRIPT_DIR/configs/btop/btop.conf" \
-        "$CONFIG_DIR/btop/btop.conf" "process monitor config"
-    mkdir -p "$CONFIG_DIR/btop/themes"
-    backup_and_install "$SCRIPT_DIR/configs/btop/necrodermis.theme" \
-        "$CONFIG_DIR/btop/themes/necrodermis.theme" "process monitor skin"
+    print_section "BTOP  //  PROCESS MONITOR NODE"
+
+    local SRC="$SCRIPT_DIR/configs/btop"
+    local DEST="$CONFIG_DIR/btop"
+
+    necro_print "btop" "Deploying configuration..."
+
+    if [ -d "$DEST" ] && [ ! -L "$DEST" ]; then
+        necro_backup "$DEST"
+    fi
+
+    if [ -L "$DEST" ]; then
+        rm "$DEST"
+    fi
+
+    necro_run mkdir -p "$DEST"
+    necro_run cp -r "$SRC/." "$DEST/"
+
+    necro_print "btop" "Deployed — user-owned, not symlinked."
 }

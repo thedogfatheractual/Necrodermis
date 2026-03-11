@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/fastfetch.sh
-# Extracted from monolith install-OGSHELL.sh
 # Component: install_fastfetch
 
 install_fastfetch() {
-    print_section "FASTFETCH  //  SYSTEM MANIFEST DISPLAY"
-    backup_and_install "$SCRIPT_DIR/configs/fastfetch/config.jsonc" \
-        "$CONFIG_DIR/fastfetch/config.jsonc" "manifest config"
-    backup_and_install "$SCRIPT_DIR/configs/fastfetch/necron-warrior-final.txt" \
-        "$CONFIG_DIR/fastfetch/necron-warrior-final.txt" "necron warrior sigil"
+    print_section "FASTFETCH  //  SYSTEM READOUT NODE"
+
+    local SRC="$SCRIPT_DIR/configs/fastfetch"
+    local DEST="$CONFIG_DIR/fastfetch"
+
+    necro_print "fastfetch" "Deploying configuration..."
+
+    if [ -d "$DEST" ] && [ ! -L "$DEST" ]; then
+        necro_backup "$DEST"
+    fi
+
+    if [ -L "$DEST" ]; then
+        rm "$DEST"
+    fi
+
+    necro_run mkdir -p "$DEST"
+    necro_run cp -r "$SRC/." "$DEST/"
+
+    necro_print "fastfetch" "Deployed — user-owned, not symlinked."
 }
