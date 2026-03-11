@@ -9,7 +9,7 @@ RESURRECTION PROTOCOLS: ONLINE
 
 ---
 
-Necrodermis is a Hyprland desktop theme built on the visual language of the Necrons — ancient, clinical, cold. Green phosphor on black. It skins your entire desktop into a unified tombworld aesthetic. Every component talks to every other component.
+Necrodermis is a Hyprland desktop theme built on the visual language of the Necrons — ancient, clinical, cold. Green phosphor on black. It skins your entire desktop into a unified tombworld aesthetic.
 
 Built on the scaffolding of **JaKooLit's Hyprland-Dots**. Give them a star: https://github.com/JaKooLit/Arch-Hyprland
 
@@ -17,7 +17,7 @@ Built on the scaffolding of **JaKooLit's Hyprland-Dots**. Give them a star: http
 
 ## REQUIREMENTS
 
-- Arch Linux, CachyOS, Manjaro, or EndeavourOS
+- Arch Linux (or one of it's spawns)
 - An internet connection
 
 ---
@@ -71,7 +71,7 @@ Registered automatically during install. Removes components one by one and resto
 | **Swaync** | Notification centre |
 | **Icons** | Flat-Remix-Necrodermis recolour |
 | **Wallpapers** | Necron art — `~/Pictures/wallpapers/necrodermis/` |
-| **GRUB** | Boot theme |
+| **GRUB** | Necron based - Boot theme |
 | **Plymouth** | Splash screen — tomb world awakening sequence |
 | **Fish** | Shell aliases — `sysupdate`, `sysclean` |
 
@@ -83,7 +83,7 @@ Registered automatically during install. Removes components one by one and resto
 - **Keyitdev** — sddm-astronaut-theme (GPLv3+) https://github.com/Keyitdev/sddm-astronaut-theme
 - **ChrisTitusTech** — linutil https://github.com/ChrisTitusTech
 - **ML4W** — Hyprland dotfiles https://github.com/mylinuxforwork/dotfiles
-
+- **ANYONE ELSE I DID NOT MENTION, SORRY BUT YOU'RE THE BEST**
 ---
 
 ```
