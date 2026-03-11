@@ -227,12 +227,12 @@ remove_sddm() {
     sudo_remove "/etc/systemd/system/necrodermis-weather.service" "weather service"
     sudo_remove "/etc/systemd/system/sddm.service.d/necrodermis.conf" "SDDM QML override"
     sudo_remove "/etc/sddm.conf.d/necrodermis.conf" "SDDM theme config"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/Main.qml" "Main.qml"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/Components/Clock.qml" "Clock.qml"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/Components/LoginForm.qml" "LoginForm.qml"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/theme.conf" "theme.conf"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/Backgrounds/necrodermis.jpg" "background image"
-    sudo_remove "/usr/share/sddm/themes/simple_sddm_2/weather.sh" "weather script"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/Main.qml" "Main.qml"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/Components/Clock.qml" "Clock.qml"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/Components/LoginForm.qml" "LoginForm.qml"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/theme.conf" "theme.conf"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/Backgrounds/necrodermis.jpg" "background image"
+    sudo_remove "/usr/share/sddm/themes/sddm-astronaut-theme/weather.sh" "weather script"
     rm -f /tmp/sddm-weather /tmp/sddm-weather-code /tmp/sddm-weather-moon
     sudo systemctl daemon-reload
     print_ok "Tomb world interface sealed  ${DG}//  SDDM restored to default${NC}"
@@ -318,7 +318,7 @@ remove_backups() {
 
 remove_grub() {
     print_section "GRUB  //  PURGING BOOT SEQUENCE OVERRIDE"
-    sudo_remove "/boot/grub/themes/sautekh" "GRUB theme directory"
+    sudo_remove "/boot/grub/themes/necrodermis" "GRUB theme directory"
 
     if [ -f /etc/default/grub.necrodermis-backup ]; then
         sudo cp /etc/default/grub.necrodermis-backup /etc/default/grub
@@ -347,7 +347,7 @@ remove_plymouth() {
         print_ok "Plymouth theme reset  ${DG}//  default restored${NC}"
     fi
 
-    sudo_remove "/usr/share/plymouth/themes/sautekh" "Plymouth theme directory"
+    sudo_remove "/usr/share/plymouth/themes/necrodermis" "Plymouth theme directory"
 
     print_info "Rebuilding initramfs  //  this will take a moment..."
     sudo mkinitcpio -P
