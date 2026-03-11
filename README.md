@@ -38,7 +38,7 @@ https://github.com/Keyitdev/sddm-astronaut-theme
 
 ## REQUIREMENTS
 
-- Arch Linux, CachyOS, Manjaro, or EndeavourOS
+- Arch Linux based distro
 - An internet connection
 - That's it — the installer handles everything else
 
