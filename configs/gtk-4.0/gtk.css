@@ -1,0 +1,70 @@
+/* NECRODERMIS — GTK overrides */
+.sidebar, .sidebar .view { background-color: #010a01; color: #00cc00; }
+.sidebar row:selected, .sidebar row:hover { background-color: #003300; color: #00ff00; }
+
+/* Sidebar sub-items — dark green */
+.sidebar .view row label { color: #00cc00; }
+
+/* Sidebar group headers — bright highlighted row */
+.sidebar .view > row.header,
+.sidebar row.header {
+    background-color: #003300;
+    color: #00ff00;
+    font-weight: bold;
+}
+.sidebar row.header label { color: #00ff00; }
+
+headerbar, .titlebar, toolbar { background-color: #000000; color: #00ff00; }
+headerbar image, toolbar image { color: #00ff00; }
+.path-bar button, .path-bar button label { color: #00ff00; background-color: transparent; }
+window, .view { background-color: #000000; color: #00cc00; }
+.statusbar, statusbar { background-color: #000000; color: #00cc00; }
+* { border-color: #001a00; }
+button, button.flat, button.image-button { background-color: #000000; background-image: none; color: #00ff00; border-color: #001a00; box-shadow: none; }
+button:hover { background-color: #003300; }
+scale trough { background-color: #0a1a0a; border-color: #003300; }
+scale trough highlight, scale trough progress { background-color: #00ff00; background-image: none; }
+scale slider { background-color: #00ff00; background-image: none; border-color: #00ff00; min-width: 12px; min-height: 12px; border-radius: 6px; }
+scale slider:hover { background-color: #00cc00; }
+
+/* Nemo location bar */
+.nautilus-path-bar,
+.path-bar,
+NemoPathBar,
+.nemo-pathbar {
+    background-color: #000000;
+    color: #00cc00;
+}
+
+/* Selected text highlight */
+@define-color selected_bg_color #003300;
+@define-color selected_fg_color #00ff00;
+selection {
+    background-color: #003300;
+    color: #00ff00;
+}
+
+/* Focus ring */
+*:focus {
+    outline-color: #003300;
+    outline-width: 1px;
+}
+entry:focus {
+    border-color: #003300;
+    box-shadow: 0 0 0 2px #003300;
+}
+
+/* override libadwaita accent at variable level */
+* {
+    --accent-blue: #00ff00;
+    --accent-bg-color: #00ff00;
+    --accent-color: #00ff00;
+}
+
+/* Sidebar active item underline */
+.sidebar row:selected label,
+.sidebar row:active label {
+    text-decoration-color: #00ff00;
+}
+
+rubberband { background-color: rgba(0, 255, 0, 0.8) !important; border: 1px solid #00ff00 !important; }
