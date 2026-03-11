@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/plymouth.sh
-# Extracted from monolith install-OGSHELL.sh
 # Component: install_plymouth
 
 install_plymouth() {
     print_section "PLYMOUTH  //  INITRAMFS SPLASH PROTOCOL"
 
     if [ ! -d "$SCRIPT_DIR/themes/plymouth/necrodermis" ]; then
-        print_err "Plymouth theme source not found: $SCRIPT_DIR/themes/plymouth/necrodermis"
-        return 1
+        print_err "Plymouth theme source not found: $SCRIPT_DIR/themes/plymouth/necrodermis  //  skipping"
+        return 0
     fi
 
     if ! command -v plymouth-set-default-theme &>/dev/null; then
@@ -19,9 +18,8 @@ install_plymouth() {
             if [ -n "$AUR_HELPER" ]; then
                 $AUR_HELPER -S --needed plymouth
             else
-                print_err "Plymouth install failed — no AUR helper available"
-                print_info "Install manually: sudo pacman -S plymouth"
-                return 1
+                print_err "Plymouth install failed — no AUR helper available  //  skipping"
+                return 0
             fi
         fi
     fi
@@ -33,9 +31,9 @@ install_plymouth() {
     sudo plymouth-set-default-theme necrodermis
     print_ok "Default splash theme set  ${DG}//  necrodermis active${NC}"
 
-    # Inject plymouth into mkinitcpio HOOKS if not already present
-    # Must appear after base and udev, before filesystems
-    if grep -q "^HOOKS=" /etc/mkinitcpio.conf; then
+    # ── INITRAMFS REBUILD ──
+    if [ -f /etc/mkinitcpio.conf ]; then
+        # mkinitcpio system (most Arch installs)
         if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
             sudo cp /etc/mkinitcpio.conf /etc/mkinitcpio.conf.necrodermis-backup
             sudo sed -i 's/\(HOOKS=.*\budev\b\)/\1 plymouth/' /etc/mkinitcpio.conf
@@ -43,11 +41,15 @@ install_plymouth() {
         else
             print_info "plymouth already present in mkinitcpio HOOKS  //  skipping"
         fi
+        print_info "Rebuilding initramfs  //  this will take a moment..."
+        sudo mkinitcpio -P
+        print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
+    elif command -v dracut &>/dev/null; then
+        # dracut system (some EndeavourOS / CachyOS installs)
+        print_info "dracut detected  //  rebuilding initramfs..."
+        sudo dracut --force
+        print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
     else
-        print_err "Could not find HOOKS= in /etc/mkinitcpio.conf — add plymouth manually"
+        print_err "Neither mkinitcpio nor dracut found  //  rebuild initramfs manually after install"
     fi
-
-    print_info "Rebuilding initramfs  //  this will take a moment..."
-    sudo mkinitcpio -P
-    print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
 }
