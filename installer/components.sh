@@ -1,14 +1,5 @@
-#!/usr/bin/env bash
-# ════════════════════════════════════════════════════════════
-# NECRODERMIS — COMPONENT DEFINITIONS
-# Add a component: one entry in COMPONENTS array + a matching
-# function file in scripts/functions/install_<name>.sh
-# ════════════════════════════════════════════════════════════
-#
-# Format: "NAME|CATEGORY|DESCRIPTION|FUNCTION"
-# CATEGORIES: CORE  VISUAL  SYSTEM  EXTRAS
-
 COMPONENTS=(
+    "HyprlandBase|CORE|Full Hyprland dependency stack — run on bare Arch|install_hyprland_base"
     "Hyprland|CORE|Keybinds, decorations, window rules|install_hypr"
     "Hyprlock|CORE|Screen locker configuration|install_hyprlock"
     "Waybar|CORE|Status bar|install_waybar"
