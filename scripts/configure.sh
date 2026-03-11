@@ -135,7 +135,7 @@ configure_location() {
         "$opt_off"*)
             echo ""
             print_info "Atmospheric sensors disabled  //  login display will show: no signal"
-            print_info "The tomb is self-contained. No external contact required; that's too much voodoo, and I don't need to see the glowies."
+            print_info "The tomb is self-contained. No external contact required; that's too much voodoo"
             echo "DISABLED" > /tmp/necrodermis-icao
             ;;
         "$opt_ip"*)
