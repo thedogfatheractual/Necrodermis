@@ -40,6 +40,7 @@ https://github.com/Keyitdev/sddm-astronaut-theme
 
 - Arch Linux based distro
 - An internet connection
+- Git
 - That's it — the installer handles everything else
 
 If you don't have Hyprland, select **Full install** mode. The installer will launch JaKooLit's setup — follow their prompts, and once complete, Necrodermis layers on top automatically.
