@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/waybar.sh
-# Extracted from monolith install-OGSHELL.sh
 # Component: install_waybar
 
 install_waybar() {
     print_section "WAYBAR  //  STATUS ARRAY CALIBRATION"
-    backup_and_install "$SCRIPT_DIR/configs/waybar/config" \
-        "$CONFIG_DIR/waybar/config" "status array config"
-    backup_and_install "$SCRIPT_DIR/configs/waybar/style.css" \
-        "$CONFIG_DIR/waybar/style.css" "status array skin"
+
+    local WAYBAR_SRC="$SCRIPT_DIR/configs/waybar"
+    local WAYBAR_DEST="$CONFIG_DIR/waybar"
+
+    necro_print "waybar" "Deploying status array configuration..."
+
+    # ── Backup existing waybar config ─────────────────────────────────────────
+    if [ -d "$WAYBAR_DEST" ] && [ ! -L "$WAYBAR_DEST" ]; then
+        necro_backup "$WAYBAR_DEST"
+    fi
+
+    # ── Symlink entire waybar config directory ────────────────────────────────
+    if [ -L "$WAYBAR_DEST" ]; then
+        rm "$WAYBAR_DEST"
+    fi
+
+    necro_run ln -sf "$WAYBAR_SRC" "$WAYBAR_DEST"
+
+    necro_print "waybar" "Status array linked — editing ~/.config/waybar edits the repo."
 }

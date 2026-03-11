@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/swaync.sh
-# Extracted from monolith install-OGSHELL.sh
 # Component: install_swaync
 
 install_swaync() {
-    print_section "SWAYNC  //  COMMUNICATION ARRAY"
-    backup_and_install "$SCRIPT_DIR/configs/swaync/config.json" \
-        "$CONFIG_DIR/swaync/config.json" "communication array config"
-    backup_and_install "$SCRIPT_DIR/configs/swaync/style.css" \
-        "$CONFIG_DIR/swaync/style.css" "communication array skin"
-    swaync-client --reload-config 2>/dev/null \
-        && print_ok "Communication array reloaded  ${DG}//  transmissions nominal${NC}" \
-        || true
+    print_section "SWAYNC  //  NOTIFICATION RELAY NODE"
+
+    local SWAYNC_SRC="$SCRIPT_DIR/configs/swaync"
+    local SWAYNC_DEST="$CONFIG_DIR/swaync"
+
+    necro_print "swaync" "Deploying notification relay configuration..."
+
+    if [ -d "$SWAYNC_DEST" ] && [ ! -L "$SWAYNC_DEST" ]; then
+        necro_backup "$SWAYNC_DEST"
+    fi
+
+    if [ -L "$SWAYNC_DEST" ]; then
+        rm "$SWAYNC_DEST"
+    fi
+
+    necro_run ln -sf "$SWAYNC_SRC" "$SWAYNC_DEST"
+
+    necro_print "swaync" "Notification relay linked — editing ~/.config/swaync edits the repo."
 }
