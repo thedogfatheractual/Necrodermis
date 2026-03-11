@@ -176,7 +176,7 @@ declare -A TZ_ICAO=(
 source "$SCRIPT_DIR/scripts/common.sh"
 source "$SCRIPT_DIR/scripts/detect.sh"
 source "$SCRIPT_DIR/scripts/configure.sh"
-source "$SCRIPT_DIR/config/components.sh"
+source "$SCRIPT_DIR/installer/components.sh"
 
 for fn in "$SCRIPT_DIR/scripts/functions/"*.sh; do
     source "$fn"
