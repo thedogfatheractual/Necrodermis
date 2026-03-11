@@ -10,6 +10,7 @@
 
 COMPONENTS=(
     "Hyprland|CORE|Keybinds, decorations, window rules|install_hypr"
+    "Hyprlock|CORE|Screen locker configuration|install_hyprlock"
     "Waybar|CORE|Status bar|install_waybar"
     "Rofi|CORE|Launcher / command interface|install_rofi"
     "Kitty|CORE|Terminal|install_kitty"
