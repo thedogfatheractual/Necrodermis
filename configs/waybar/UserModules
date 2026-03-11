@@ -1,0 +1,12 @@
+//* ---- NECRODERMIS — USER MODULES ---- *//
+{
+
+"custom/gpu-temp": {
+	"exec": "cat /sys/class/hwmon/hwmon*/temp1_input 2>/dev/null | head -1 | awk '{printf \"%.0f°C 󰢮\", $1/1000}'",
+	"interval": 5,
+	"format": "{}",
+	"tooltip": true,
+	"tooltip-format": "GPU Edge Temperature",
+},
+
+}

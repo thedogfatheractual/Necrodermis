@@ -1,0 +1,346 @@
+/* ================================================================
+   NECRODERMIS — SAUTEKH DYNASTY
+   Rofi Theme
+   https://github.com/YOUR_GIT_HERE
+   ================================================================ */
+
+/*****----- Configuration -----*****/
+configuration {
+    modi:                       "drun,run,filebrowser,window";
+    show-icons:                 true;
+    display-drun:               "APPS";
+    display-run:                "RUN";
+    display-filebrowser:        "FILES";
+    display-window:             "WINDOW";
+    drun-display-format:        "{name}";
+    window-format:              "{w} · {c} · {t}";
+    hover-select:               true;
+    me-select-entry:            "MouseSecondary";
+    me-accept-entry:            "MousePrimary";
+    font:                       "TerminessNerdFontMono 14";
+}
+
+/*****----- Necrodermis Palette -----*****/
+* {
+    nd-green:       #00ff00;
+    nd-green-mid:   #00cc00;
+    nd-green-deep:  #006600;
+    nd-green-void:  #003300;
+    nd-surface:     rgba(1, 8, 2, 0.92);
+    nd-surface-alt: rgba(2, 12, 3, 0.88);
+    nd-border:      rgba(0, 80, 0, 0.7);
+    nd-black:       #000000;
+
+    background-color:            transparent;
+    text-color:                  @nd-green;
+
+    background-alt:              @nd-surface-alt;
+    selected:                    @nd-green;
+    active:                      @nd-green-mid;
+    urgent:                      @nd-green-deep;
+
+    border-color:                @nd-border;
+    handle-color:                @nd-green-deep;
+    foreground-color:            @nd-green;
+    alternate-background:        @nd-surface-alt;
+    normal-background:           transparent;
+    normal-foreground:           @nd-green-mid;
+    urgent-background:           @nd-green-void;
+    urgent-foreground:           @nd-green;
+    active-background:           @nd-green-void;
+    active-foreground:           @nd-green;
+    selected-normal-background:  @nd-green-deep;
+    selected-normal-foreground:  @nd-green;
+    selected-urgent-background:  @nd-green-deep;
+    selected-urgent-foreground:  @nd-green;
+    selected-active-background:  @nd-green-deep;
+    selected-active-foreground:  @nd-green;
+    alternate-normal-background: transparent;
+    alternate-normal-foreground: @nd-green-mid;
+    alternate-urgent-background: @nd-green-void;
+    alternate-urgent-foreground: @nd-green;
+    alternate-active-background: @nd-green-void;
+    alternate-active-foreground: @nd-green;
+}
+
+/*****----- Main Window -----*****/
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    fullscreen:                  false;
+    width:                       38%;
+    x-offset:                    0px;
+    y-offset:                    0px;
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      1px solid;
+    border-radius:               4px;
+    border-color:                @nd-border;
+    background-color:            @nd-surface;
+    cursor:                      "default";
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    enabled:                     true;
+    spacing:                     8px;
+    margin:                      0px;
+    padding:                     16px;
+    border:                      0px solid;
+    border-radius:               0px;
+    background-color:            transparent;
+    children:                    [ "inputbar", "message", "custombox" ];
+}
+
+/*****----- Custom Box -----*****/
+custombox {
+    spacing:                     0px;
+    background-color:            transparent;
+    text-color:                  @nd-green;
+    orientation:                 horizontal;
+    children:                    [ "mode-switcher", "listview" ];
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    enabled:                     true;
+    spacing:                     8px;
+    margin:                      0px;
+    padding:                     8px 12px;
+    border:                      0px 0px 1px 0px;
+    border-radius:               0px;
+    border-color:                @nd-border;
+    background-color:            transparent;
+    text-color:                  @nd-green;
+    children:                    [ "textbox-prompt-colon", "entry", "num-filtered-rows", "textbox-num-sep", "num-rows" ];
+}
+
+prompt {
+    enabled:                     true;
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+}
+
+textbox-prompt-colon {
+    enabled:                     true;
+    padding:                     5px 8px 5px 0px;
+    expand:                      false;
+    str:                         "⬢";
+    background-color:            transparent;
+    text-color:                  @nd-green;
+}
+
+entry {
+    enabled:                     true;
+    padding:                     5px 0px;
+    background-color:            transparent;
+    text-color:                  @nd-green;
+    cursor:                      text;
+    placeholder:                 "INITIATE SEARCH PROTOCOL...";
+    placeholder-color:           @nd-green-void;
+}
+
+num-filtered-rows {
+    enabled:                     true;
+    expand:                      false;
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+}
+
+textbox-num-sep {
+    enabled:                     true;
+    expand:                      false;
+    str:                         "/";
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+}
+
+num-rows {
+    enabled:                     true;
+    expand:                      false;
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+}
+
+case-indicator {
+    enabled:                     true;
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+}
+
+/*****----- Listview -----*****/
+listview {
+    enabled:                     true;
+    columns:                     1;
+    lines:                       7;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    layout:                      vertical;
+    reverse:                     false;
+    fixed-height:                true;
+    fixed-columns:               true;
+    spacing:                     2px;
+    margin:                      0px;
+    padding:                     8px;
+    border:                      0px 0px 0px 1px;
+    border-radius:               0px;
+    border-color:                @nd-border;
+    background-color:            transparent;
+    text-color:                  @nd-green;
+    cursor:                      "default";
+}
+
+scrollbar {
+    handle-width:                2px;
+    handle-color:                @nd-green-deep;
+    border-radius:               0px;
+    background-color:            @nd-surface-alt;
+}
+
+/*****----- Elements -----*****/
+element {
+    enabled:                     true;
+    spacing:                     10px;
+    margin:                      0px;
+    padding:                     8px 10px;
+    border:                      0px solid;
+    border-radius:               3px;
+    border-color:                @nd-border;
+    background-color:            transparent;
+    text-color:                  @nd-green-mid;
+    cursor:                      pointer;
+}
+
+element normal.normal {
+    background-color:            transparent;
+    text-color:                  @nd-green-mid;
+}
+
+element normal.urgent {
+    background-color:            @nd-green-void;
+    text-color:                  @nd-green;
+}
+
+element normal.active {
+    background-color:            transparent;
+    text-color:                  @nd-green;
+}
+
+element selected.normal {
+    background-color:            @nd-green-void;
+    text-color:                  @nd-green;
+    border:                      0px 0px 0px 2px;
+    border-color:                @nd-green;
+}
+
+element selected.urgent {
+    background-color:            @nd-green-deep;
+    text-color:                  @nd-green;
+}
+
+element selected.active {
+    background-color:            @nd-green-deep;
+    text-color:                  @nd-green;
+}
+
+element alternate.normal {
+    background-color:            rgba(0, 40, 0, 0.4);
+    text-color:                  @nd-green-mid;
+}
+
+element alternate.urgent {
+    background-color:            @nd-green-void;
+    text-color:                  @nd-green;
+}
+
+element alternate.active {
+    background-color:            @nd-green-void;
+    text-color:                  @nd-green;
+}
+
+element-icon {
+    background-color:            transparent;
+    text-color:                  inherit;
+    size:                        24px;
+    cursor:                      inherit;
+}
+
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    highlight:                   bold;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+    font:                        "TerminessNerdFontMono 13";
+}
+
+/*****----- Mode Switcher -----*****/
+mode-switcher {
+    enabled:                     true;
+    expand:                      false;
+    orientation:                 vertical;
+    spacing:                     0px;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px 1px 0px 0px;
+    border-radius:               0px;
+    border-color:                @nd-border;
+    background-color:            @nd-surface-alt;
+    text-color:                  @nd-green-deep;
+}
+
+button {
+    padding:                     10px 16px;
+    border:                      0px;
+    border-radius:               0px;
+    background-color:            transparent;
+    text-color:                  @nd-green-deep;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+    cursor:                      pointer;
+    font:                        "TerminessNerdFontMono 12";
+}
+
+button selected {
+    border:                      0px 0px 0px 2px;
+    border-color:                @nd-green;
+    background-color:            @nd-green-void;
+    text-color:                  @nd-green;
+}
+
+/*****----- Message -----*****/
+message {
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px solid;
+    background-color:            transparent;
+    text-color:                  @nd-green;
+}
+
+textbox {
+    padding:                     10px;
+    border:                      0px solid;
+    border-radius:               3px;
+    border-color:                @nd-border;
+    background-color:            @nd-surface-alt;
+    text-color:                  @nd-green-mid;
+    vertical-align:              0.5;
+    horizontal-align:            0.5;
+    highlight:                   none;
+    blink:                       true;
+    markup:                      true;
+}
+
+error-message {
+    padding:                     10px;
+    border:                      1px solid;
+    border-radius:               3px;
+    border-color:                @nd-border;
+    background-color:            @nd-surface;
+    text-color:                  @nd-green;
+}

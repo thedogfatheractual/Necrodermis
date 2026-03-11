@@ -1,0 +1,9 @@
+/* ---- NECRODERMIS — Global Rofi Fonts ---- */
+
+configuration {
+  font: "TerminessNerdFontMono 14";
+}
+
+element-text {
+  font: "TerminessNerdFontMono 13";
+}

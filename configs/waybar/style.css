@@ -1,0 +1,320 @@
+/* ================================================================
+   NECRODERMIS — SAUTEKH DYNASTY
+   Waybar Theme v1.0
+   Floating island layout — sparse, threatening, no wallust dependency
+   ================================================================ */
+
+
+/* ---- NECRODERMIS PALETTE ---- */
+@define-color nd-green       #00ff00;
+@define-color nd-green-mid   #00cc00;
+@define-color nd-green-deep  #006600;
+@define-color nd-green-void  #003300;
+@define-color nd-surface     rgba(2, 8, 2, 0.88);
+@define-color nd-border      rgba(0, 102, 0, 0.8);
+@define-color nd-glow        rgba(0, 255, 0, 0.06);
+@define-color nd-critical    #004400;
+@define-color nd-warning     #005500;
+
+/* ---- BASE ---- */
+* {
+	font-family: "TerminessNerdFontMono", "Terminess Nerd Font Mono", "JetBrainsMono Nerd Font";
+	font-weight: bold;
+	font-size: 13px;
+	min-height: 0;
+	border: none;
+	border-radius: 0;
+}
+
+window#waybar {
+	background: transparent;
+	color: @nd-green;
+}
+
+window#waybar.hidden {
+	opacity: 0.2;
+}
+
+/* ================================================================
+   ISLAND CONTAINERS
+   ================================================================ */
+
+.modules-left {
+	background: @nd-surface;
+	border: 1px solid @nd-border;
+	border-radius: 4px;
+	padding: 0 6px;
+}
+
+.modules-center {
+	background: @nd-surface;
+	border: 1px solid @nd-border;
+	border-radius: 4px;
+	padding: 0 6px;
+}
+
+.modules-right {
+	background: @nd-surface;
+	border: 1px solid @nd-border;
+	border-radius: 4px;
+	padding: 0 6px;
+}
+
+/* ================================================================
+   ALL MODULES — base reset
+   ================================================================ */
+
+#backlight, #battery, #bluetooth, #clock, #cpu, #disk,
+#idle_inhibitor, #keyboard-state, #memory, #mode, #mpris,
+#network, #power-profiles-daemon, #pulseaudio, #temperature,
+#tray, #window, #wireplumber, #workspaces,
+#custom-tomb-sigil, #custom-reanimation-cycle,
+#custom-backlight, #custom-nightlight, #custom-browser,
+#custom-cava_mviz, #custom-cycle_wall, #custom-dot_update,
+#custom-file_manager, #custom-hint, #custom-hypridle,
+#custom-menu, #custom-playerctl, #custom-power,
+#custom-quit, #custom-reboot, #custom-settings,
+#custom-swaync, #custom-tty, #custom-updater,
+#custom-hyprpicker, #custom-weather, #custom-lock,
+#custom-keyboard, #custom-light_dark {
+	color: @nd-green;
+	background: transparent;
+	padding: 4px 8px;
+	margin: 0;
+}
+
+/* ================================================================
+   TOMB SIGIL
+   ================================================================ */
+
+#custom-tomb-sigil {
+	color: @nd-green;
+	font-size: 16px;
+	padding: 4px 10px 4px 8px;
+}
+
+/* ================================================================
+   CAVA
+   ================================================================ */
+
+#custom-cava_mviz {
+	color: @nd-green;
+	font-size: 11px;
+	letter-spacing: -2px;
+	padding: 4px 4px;
+	min-width: 60px;
+}
+
+/* ================================================================
+   WINDOW TITLE
+   ================================================================ */
+
+#window {
+	color: @nd-green-mid;
+	font-size: 12px;
+	padding: 4px 10px;
+}
+
+window#waybar.empty #window {
+	padding: 0;
+	background: transparent;
+	border: none;
+	min-width: 0;
+}
+
+/* ================================================================
+   WORKSPACES
+   ================================================================ */
+
+#workspaces {
+	padding: 0 2px;
+	background: transparent;
+}
+
+#workspaces button {
+	color: @nd-green-deep;
+	background: transparent;
+	padding: 2px 8px;
+	border-radius: 3px;
+	border: none;
+	font-size: 13px;
+	transition: all 0.2s ease;
+	min-width: 24px;
+}
+
+#workspaces button.active {
+	color: @nd-green;
+	background: @nd-glow;
+	border-bottom: 2px solid @nd-green;
+	padding: 2px 10px;
+}
+
+#workspaces button.urgent {
+	color: @nd-green-mid;
+	border-bottom: 2px solid @nd-green-mid;
+}
+
+#workspaces button:hover {
+	color: @nd-green;
+	background: @nd-glow;
+	border-radius: 3px;
+}
+
+/* ================================================================
+   CLOCK
+   ================================================================ */
+
+#clock {
+	color: @nd-green;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	padding: 4px 12px;
+}
+
+/* ================================================================
+   WEATHER
+   ================================================================ */
+
+#custom-weather {
+	color: @nd-green-mid;
+	padding: 4px 8px;
+}
+
+/* ================================================================
+   NETWORK
+   ================================================================ */
+
+#network {
+	color: @nd-green-mid;
+	padding: 4px 8px;
+	min-width: 160px;
+}
+
+/* ================================================================
+   TEMPERATURE
+   ================================================================ */
+
+#temperature {
+	color: @nd-green-mid;
+}
+
+#temperature.critical {
+	color: @nd-critical;
+	background: rgba(0, 68, 0, 0.2);
+	border-bottom: 2px solid @nd-critical;
+}
+
+/* ================================================================
+   AUDIO
+   ================================================================ */
+
+#pulseaudio {
+	color: @nd-green-mid;
+}
+
+#pulseaudio.muted {
+	color: @nd-green-void;
+}
+
+/* ================================================================
+   GPU TEMP
+   ================================================================ */
+
+#custom-gpu-temp {
+	color: @nd-green-mid;
+	padding: 4px 8px;
+}
+
+/* ================================================================
+   REANIMATION CYCLE
+   ================================================================ */
+
+#custom-reanimation-cycle {
+	color: @nd-green-deep;
+	font-size: 12px;
+}
+
+/* ================================================================
+   POWER
+   ================================================================ */
+
+#custom-power {
+	color: @nd-green-deep;
+	font-size: 14px;
+	padding: 4px 10px;
+}
+
+#custom-power:hover {
+	color: @nd-green;
+}
+
+/* ================================================================
+   TOOLTIPS
+   ================================================================ */
+
+tooltip {
+	background: rgba(2, 8, 2, 0.97);
+	border: 1px solid @nd-border;
+	border-radius: 4px;
+	color: @nd-green;
+	font-size: 12px;
+}
+
+tooltip label {
+	color: @nd-green;
+}
+
+/* ================================================================
+   SLIDERS
+   ================================================================ */
+
+#pulseaudio-slider slider {
+	min-width: 0px;
+	min-height: 0px;
+	opacity: 0;
+	background-image: none;
+	border: none;
+	box-shadow: none;
+}
+
+#pulseaudio-slider trough {
+	min-width: 60px;
+	min-height: 4px;
+	border-radius: 2px;
+	background-color: @nd-green-void;
+}
+
+#pulseaudio-slider highlight {
+	min-height: 4px;
+	border-radius: 2px;
+	background-color: @nd-green;
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+
+@keyframes blink {
+	to { opacity: 0.3; }
+}
+
+/* ================================================================
+   TRAY
+   ================================================================ */
+
+#tray {
+	padding: 4px 8px;
+}
+
+#tray > .passive {
+	opacity: 0.4;
+}
+
+#tray > .needs-attention {
+	-gtk-icon-effect: highlight;
+}
+
+#tray image {
+	opacity: 0.4;
+}

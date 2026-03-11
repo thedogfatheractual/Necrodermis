@@ -1,0 +1,20 @@
+/* ---- NECRODERMIS — SAUTEKH DYNASTY ---- */
+/* https://github.com/YOUR_GIT_HERE       */
+
+@import "~/.config/rofi/0-shared-fonts.rasi"
+@theme "~/.config/rofi/themes/necrodermis.rasi"
+
+configuration {
+    display-drun:               "APPS";
+    display-run:                "RUN";
+    display-filebrowser:        "FILES";
+    display-window:             "WINDOW";
+    modi:                       "drun,run,filebrowser,window";
+    show-icons:                 true;
+    drun-display-format:        "{name}";
+    window-format:              "{w} · {c} · {t}";
+    hover-select:               true;
+    me-select-entry:            "MouseSecondary";
+    me-accept-entry:            "MousePrimary";
+    font:                       "TerminessNerdFontMono 14";
+}

@@ -1,0 +1,71 @@
+/* ---- NECRODERMIS — SAUTEKH DYNASTY WAYBAR ---- */
+/* Island/pill layout — sparse, threatening, no clutter */
+
+{
+"include": [
+  "$HOME/.config/waybar/Modules",
+  "$HOME/.config/waybar/ModulesWorkspaces",
+  "$HOME/.config/waybar/ModulesCustom",
+  "$HOME/.config/waybar/ModulesGroups",
+  "$HOME/.config/waybar/UserModules",
+  ],
+
+"layer": "top",
+"exclusive": true,
+"passthrough": false,
+"position": "top",
+"spacing": 0,
+"fixed-center": true,
+"ipc": true,
+"margin-top": 6,
+"margin-left": 12,
+"margin-right": 12,
+
+"modules-left": [
+	"custom/cava_mviz",
+	"custom/separator#blank_2",
+	"hyprland/window",
+	],
+
+"modules-center": [
+	"custom/swaync",
+	"custom/separator#blank",
+	"hyprland/workspaces#rw",
+	"custom/separator#blank_2",
+	"clock",
+	"custom/separator#blank_2",
+	"custom/weather",
+	],
+
+"modules-right": [
+	"network#speed",
+	"custom/separator#blank",
+	"temperature",
+	"custom/separator#blank",
+	"custom/gpu-temp",
+	"custom/separator#blank",
+	"pulseaudio",
+	"custom/separator#blank",
+	"custom/reanimation-cycle",
+	"custom/separator#blank",
+	"custom/power",
+	],
+
+// ---- NECRODERMIS CUSTOM MODULES ----
+
+"custom/tomb-sigil": {
+	"format": "⬡",
+	"interval": "once",
+	"tooltip": false,
+},
+
+"custom/reanimation-cycle": {
+	"format": " {}",
+	"exec": "checkupdates 2>/dev/null | wc -l",
+	"exec-if": "checkupdates 2>/dev/null | wc -l | grep -v '^0$'",
+	"interval": 43200,
+	"on-click": "$HOME/.config/hypr/scripts/Distro_update.sh",
+	"tooltip": true,
+	"tooltip-format": "Constructs awaiting reanimation\nClick to assimilate",
+},
+}

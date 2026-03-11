@@ -1,0 +1,387 @@
+/* ================================================================
+   NECRODERMIS — SAUTEKH DYNASTY
+   swaync style
+   https://github.com/YOUR_GIT_HERE
+   ================================================================ */
+
+@import '../../.config/waybar/wallust/colors-waybar.css';
+
+/* ---- NECRODERMIS PALETTE ---- */
+@define-color nd-green       #00ff00;
+@define-color nd-green-mid   #00cc00;
+@define-color nd-green-deep  #006600;
+@define-color nd-green-void  #003300;
+@define-color nd-surface     rgba(1, 8, 2, 0.30);
+@define-color nd-surface-alt rgba(2, 10, 3, 0.35);
+@define-color nd-border      rgba(0, 80, 0, 0.4);
+@define-color nd-text        #00ff00;
+
+* {
+    font-family: "TerminessNerdFontMono", "Terminess Nerd Font Mono", "JetBrainsMono Nerd Font";
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+/* ================================================================
+   CONTROL CENTER PANEL
+   ================================================================ */
+
+.control-center {
+    background: @nd-surface;
+    border: 1px solid @nd-border;
+    border-radius: 6px;
+    color: @nd-text;
+}
+
+.control-center-list {
+    background: transparent;
+}
+
+.control-center-list-placeholder {
+    opacity: 0.4;
+    color: @nd-green-void;
+}
+
+.blank-window {
+    background: transparent;
+}
+
+.floating-notifications {
+    background: transparent;
+}
+
+/* ================================================================
+   NOTIFICATIONS
+   ================================================================ */
+
+.notification-row {
+    outline: none;
+}
+
+.control-center .notification-row:focus,
+.control-center .notification-row:hover {
+    opacity: 1;
+    background: @nd-surface-alt;
+    border-radius: 6px;
+}
+
+.notification {
+    background: @nd-surface;
+    padding: 3px 10px 3px 6px;
+    border-radius: 6px;
+    border: 1px solid @nd-border;
+    color: @nd-text;
+}
+
+.notification-default-action {
+    margin: 0;
+    padding: 0;
+    border-radius: 6px;
+}
+
+.notification-default-action:hover,
+.notification-action:hover {
+    background: @nd-surface-alt;
+    color: @nd-green;
+}
+
+.notification-default-action {
+    border-radius: 6px;
+    margin: 5px;
+}
+
+.notification-default-action:not(:only-child) {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.notification-action {
+    border: 1px solid @nd-border;
+    border-top: none;
+    border-radius: 6px;
+    margin-left: 10px;
+}
+
+.notification-action:first-child {
+    border-bottom-left-radius: 4px;
+    background: @nd-surface;
+}
+
+.notification-action:last-child {
+    border-bottom-right-radius: 4px;
+    background: @nd-surface-alt;
+}
+
+/* ================================================================
+   CLOSE BUTTON
+   ================================================================ */
+
+.close-button {
+    background: @nd-green-deep;
+    color: @nd-surface;
+    text-shadow: none;
+    padding: 0;
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-right: 5px;
+    border: none;
+}
+
+.close-button:hover {
+    background: @nd-green;
+    color: @nd-surface;
+    box-shadow: none;
+    border: none;
+    transition: all 0.15s ease-in-out;
+}
+
+/* ================================================================
+   TEXT
+   ================================================================ */
+
+.summary {
+    font-size: 0.95rem;
+    font-weight: bold;
+    background: transparent;
+    color: @nd-green;
+    text-shadow: none;
+}
+
+.time {
+    font-size: 0.85rem;
+    font-weight: bold;
+    background: transparent;
+    color: @nd-green-deep;
+    text-shadow: none;
+    margin-right: 18px;
+}
+
+.body {
+    font-size: 0.9rem;
+    font-weight: bold;
+    background: transparent;
+    color: @nd-green-mid;
+    text-shadow: none;
+}
+
+/* ================================================================
+   TITLE WIDGET
+   ================================================================ */
+
+.widget-title {
+    color: @nd-green;
+    background: @nd-surface-alt;
+    padding: 3px 6px;
+    margin: 5px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: 1px solid @nd-border;
+    letter-spacing: 1px;
+}
+
+.widget-title > button {
+    font-size: 0.75rem;
+    color: @nd-green-deep;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid @nd-border;
+}
+
+.widget-title > button:hover {
+    background: @nd-green-deep;
+    color: @nd-green;
+}
+
+/* ================================================================
+   DND — SILENT RUNNING
+   ================================================================ */
+
+.widget-dnd {
+    background: @nd-surface-alt;
+    padding: 3px 6px;
+    margin: 5px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: @nd-green-mid;
+    border: 1px solid @nd-border;
+}
+
+.widget-dnd > switch {
+    border-radius: 4px;
+    border: 1px solid @nd-green-deep;
+    background: @nd-surface;
+}
+
+.widget-dnd > switch:checked {
+    background: @nd-green-deep;
+    border: 1px solid @nd-green-mid;
+}
+
+.widget-dnd > switch slider {
+    background: @nd-green-void;
+    border-radius: 4px;
+}
+
+.widget-dnd > switch:checked slider {
+    background: @nd-green;
+    border-radius: 4px;
+}
+
+/* ================================================================
+   MPRIS — half size, compact
+   ================================================================ */
+
+.widget-mpris {
+    color: @nd-text;
+    background: @nd-surface-alt;
+    padding: 2px 4px;
+    margin: 4px 5px;
+    border-radius: 6px;
+    border: 1px solid @nd-border;
+    min-height: 0;
+}
+
+.widget-mpris > box > button {
+    border-radius: 4px;
+    color: @nd-green-mid;
+    border: 1px solid @nd-border;
+    background: @nd-surface;
+    padding: 2px 6px;
+}
+
+.widget-mpris > box > button:hover {
+    background: @nd-green-deep;
+    color: @nd-green;
+}
+
+.widget-mpris-player {
+    padding: 2px 4px;
+    margin: 2px;
+}
+
+.widget-mpris-title {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: @nd-green;
+}
+
+.widget-mpris-subtitle {
+    font-size: 0.75rem;
+    color: @nd-green-mid;
+}
+
+/* ================================================================
+   BUTTONS GRID — horizontal row under volume, text labels
+   ================================================================ */
+
+.widget-buttons-grid {
+    font-size: 0.9rem;
+    color: @nd-green-mid;
+    padding: 4px;
+    margin: 2px 5px 5px 5px;
+    border-radius: 6px;
+    background: @nd-surface-alt;
+    border: 1px solid @nd-border;
+}
+
+.widget-buttons-grid > flowbox {
+    halign: center;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild {
+    halign: fill;
+    hexpand: true;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button {
+    margin: 2px;
+    padding: 6px 0px;
+    background: @nd-surface;
+    border-radius: 4px;
+    border: 1px solid @nd-border;
+    color: @nd-green-mid;
+    letter-spacing: 2px;
+    min-width: 100px;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+    background: @nd-green-deep;
+    color: @nd-green;
+}
+
+/* ================================================================
+   VOLUME — bottom, wired to pactl
+   ================================================================ */
+
+.widget-volume {
+    background: @nd-surface-alt;
+    padding: 4px 8px;
+    margin: 8px 5px 5px 5px;
+    border-radius: 6px;
+    border: 1px solid @nd-border;
+    font-size: 0.9rem;
+    color: @nd-green-mid;
+}
+
+.widget-volume > box > button {
+    background: @nd-green-void;
+    border: none;
+    color: @nd-green;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.widget-volume > box > button:hover {
+    background: @nd-green-deep;
+    color: @nd-green;
+}
+
+.per-app-volume {
+    background-color: @nd-surface;
+    padding: 4px 8px 8px;
+    margin: 0 8px 8px;
+    border-radius: 6px;
+    color: @nd-green-mid;
+    border: 1px solid @nd-border;
+}
+
+/* ================================================================
+   INLINE REPLY
+   ================================================================ */
+
+.inline-reply {
+    margin-top: 8px;
+}
+
+.inline-reply-entry {
+    background: @nd-surface;
+    color: @nd-text;
+    caret-color: @nd-green;
+    border: 1px solid @nd-border;
+    border-radius: 4px;
+}
+
+.inline-reply-button {
+    font-size: 0.5rem;
+    margin-left: 4px;
+    background: @nd-surface;
+    border: 1px solid @nd-border;
+    border-radius: 4px;
+    color: @nd-green-mid;
+}
+
+.inline-reply-button:hover {
+    background: @nd-green-deep;
+    color: @nd-green;
+}
+
+.inline-reply-button:disabled {
+    background: initial;
+    color: @nd-green-void;
+    border: 1px solid transparent;
+}
+
+.body-image {
+    margin-top: 6px;
+    border-radius: 6px;
+}
