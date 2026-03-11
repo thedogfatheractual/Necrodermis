@@ -245,33 +245,6 @@ install_yay() {
     print_ok "yay installed  ${DG}//  AUR access online${NC}"
 }
 
-run_jakoolit() {
-    print_section "JAKOOLIT HYPRLAND-DOTS  //  STRUCTURAL FRAMEWORK INSTALLATION"
-    echo ""
-    echo -e "${DG}  JaKooLit's installer will now execute. Follow their prompts.${NC}"
-    echo -e "${DG}  When complete, Necrodermis will layer on top.${NC}"
-    echo ""
-    gum confirm --default=true \
-        --affirmative="  HAND CONTROL TO JAKOOLIT  " \
-        --negative="  ABORT  " \
-        "  JAKOOLIT INSTALLER WILL NOW TAKE OVER" || {
-        echo -e "\n  ${DG}  Aborted. The tomb remains in stasis.${NC}\n"
-        exit 0
-    }
-    command -v git &>/dev/null || sudo pacman -S git --noconfirm
-    local jakoolit_dir="$HOME/Arch-Hyprland"
-    if [ -d "$jakoolit_dir" ]; then
-        print_info "Arch-Hyprland directory exists  //  updating"
-        cd "$jakoolit_dir" && git stash && git pull
-    else
-        print_info "Cloning JaKooLit Arch-Hyprland..."
-        git clone --depth=1 "https://github.com/JaKooLit/Arch-Hyprland.git" "$jakoolit_dir"
-    fi
-    cd "$jakoolit_dir" && chmod +x install.sh && ./install.sh
-    cd "$SCRIPT_DIR"
-    print_ok "JaKooLit framework installed  ${DG}//  structural integrity confirmed${NC}"
-}
-
 check_deps() {
     print_section "CANOPTEK DEPENDENCY SCAN  //  VERIFYING SYSTEM INTEGRITY"
     local AUR_HELPER; AUR_HELPER="$(get_aur_helper)"
