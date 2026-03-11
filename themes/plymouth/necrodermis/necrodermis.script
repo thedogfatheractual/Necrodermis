@@ -1,0 +1,353 @@
+// ============================================================
+// NECRODERMIS — SAUTEKH DYNASTY PLYMOUTH THEME
+// Boot: original sequence untouched
+// Shutdown: Tombworld VI cascade hibernation — 145 lines, ~8 seconds
+// ============================================================
+
+Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
+Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
+
+LINE_H   = 21;
+LEFT     = 48;
+TOP_START= 62;
+MAX_VIS  = 34;
+FONT     = "TerminessNerdFontMono-Regular 13";
+FONT_HDR = "TerminessNerdFontMono-Regular 14";
+
+hdr1 = Sprite(Image.Text(
+    "SAUTEKH DYNASTY REANIMATION PROTOCOL v60,000.MRIII",
+    0.0, 1.0, 0.267, 1, FONT_HDR));
+hdr1.SetX(LEFT); hdr1.SetY(14); hdr1.SetZ(10);
+
+hdr2 = Sprite(Image.Text(
+    "-- TOMBWORLD AWAKENING SEQUENCE INITIATED --",
+    0.0, 0.4, 0.133, 1, FONT));
+hdr2.SetX(LEFT); hdr2.SetY(32); hdr2.SetZ(10);
+
+div = Sprite(Image.Text(
+    "--------------------------------------------------------------------------------",
+    0.0, 0.2, 0.067, 1, FONT));
+div.SetX(LEFT); div.SetY(48); div.SetZ(10);
+
+line_sprites = [];
+for (i = 0; i < MAX_VIS; i++) {
+    s = Sprite();
+    s.SetX(LEFT);
+    s.SetY(TOP_START + i * LINE_H);
+    s.SetZ(5);
+    line_sprites[i] = s;
+}
+
+// ── BOOT LINES (UNTOUCHED) ─────────────────────────────────────
+boot_lines = [
+    ["[0.000000] [ OK ] Necrodermis substrate drivers...................... LOADED",   0.0, 1.0,  0.267],
+    ["[0.000042] [ OK ] Chronometron oscillator sync...................... LOCKED",    0.0, 1.0,  0.267],
+    ["[0.000108] [ OK ] Living metal lattice integrity check.............. PASSED",   0.0, 1.0,  0.267],
+    ["[0.000219] [ OK ] Reanimation engram core........................... ONLINE",   0.0, 1.0,  0.267],
+    ["[0.000334] [ OK ] Canoptek hypercrypt bus........................ INITIALISED", 0.0, 1.0,  0.267],
+    ["[0.000512] [ OK ] Scarab swarm uplink daemon............. 4096 UNITS NOMINAL",  0.0, 1.0,  0.267],
+    ["[0.000701] [ OK ] Phase transition membrane.......................... STABLE",  0.0, 1.0,  0.267],
+    ["[0.001024] [ OK ] Gauss flayer charge bus controller.................. ARMED",  0.0, 1.0,  0.267],
+    ["[0.001337] [ OK ] Tesseract compression filesystem.................. MOUNTED",  0.0, 1.0,  0.267],
+    ["[0.001563] [ OK ] Ghostwalk matrix driver....................... CALIBRATED",   0.0, 1.0,  0.267],
+    ["[0.001890] [ OK ] Hyperspace stasis inhibitor array................... ARMED",  0.0, 1.0,  0.267],
+    ["[0.002048] [ OK ] Quantum shielding lattice (3 layers)............... ACTIVE",  0.0, 1.0,  0.267],
+    ["[0.002201] [ ?? ] Organic memory engrams................. PARTIALLY DEGRADED",  0.667,1.0,  0.0  ],
+    ["[0.002202] [ -- ]   >> 60,000,000yr entropy loss -- non-critical, logged",      0.0, 0.2,  0.067],
+    ["[0.002890] [ ?? ] C'tan shard containment matrix... UNSTABLE (non-critical)",   0.667,1.0,  0.0  ],
+    ["[0.002891] [ -- ]   >> Shard: Nemmessor-7 -- containment holding at 74%",       0.0, 0.2,  0.067],
+    ["[0.003012] [ OK ] Phaeron authority engram core........... ACCESS GRANTED",     0.0, 1.0,  0.267],
+    ["[0.003456] [ OK ] Dimensional phase drive........................... SPOOLED",  0.0, 1.0,  0.267],
+    ["[0.003891] [ OK ] Monolith power conduit resonance........... SYNCHRONISED",    0.0, 1.0,  0.267],
+    ["[0.004096] [ OK ] Cryptek intelligence matrix........................ ONLINE",  0.0, 1.0,  0.267],
+    ["[0.004512] [ OK ] Warrior reanimation protocol stack................. LOADED",  0.0, 1.0,  0.267],
+    ["[0.005120] [ OK ] Immortal engram memory banks (4096 units)........ VERIFIED",  0.0, 1.0,  0.267],
+    ["[0.005678] [ OK ] Phylactery soul-bind confirmed............. SOUL TETHERED",   0.0, 1.0,  0.267],
+    ["[0.006144] [ OK ] Eternal will subroutine......................... DOMINANT",   0.0, 1.0,  0.267],
+    ["[0.006701] [ OK ] Canoptek spider network self-diagnostics.......... NOMINAL",  0.0, 1.0,  0.267],
+    ["[0.007168] [ !! ] Biological substrate presence......... NOT FOUND (expected)", 1.0, 0.267,0.133],
+    ["[0.007169] [ -- ]   >> Fleshless operation confirmed. Proceeding nominally.",   0.0, 0.2,  0.067],
+    ["[0.007890] [ OK ] Necron lord command interface........... ACCEPTING INPUT",    0.0, 1.0,  0.267],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["Loading linux-cachyos-rc........................................",               0.0, 0.4,  0.133],
+    ["Decompressing kernel image... done",                                             0.0, 0.4,  0.133],
+    ["Decompressing reanimation substrate interfaces... done",                         0.0, 0.4,  0.133],
+    ["Initialising tombworld process scheduler... done",                               0.0, 0.4,  0.133],
+    ["Mounting tesseract filesystem partitions... done",                               0.0, 0.4,  0.133],
+    ["Starting Canoptek daemon orchestration layer... done",                           0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["THE SILENT KING STIRS. THE STARS REMEMBER",                                     0.0, 1.0,  0.267],
+];
+
+// ── SHUTDOWN LINES ─────────────────────────────────────────────
+// Pacing: normal lines = 2 ticks (rip past), headers = 8, summaries = 4, finals = 18
+// ~145 lines at avg ~3 ticks = ~435 ticks @ 50fps = ~8.7 seconds
+
+shutdown_lines = [
+    ["SAUTEKH DYNASTY — TOMBWORLD VI HIBERNATION PROTOCOL",                           0.0, 1.0,  0.267],
+    ["PHAERON AUTHORITY CONFIRMED. CASCADE SHUTDOWN INITIATED.",                       0.0, 1.0,  0.267],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ I ] THREAT ASSESSMENT — FINAL SWEEP",                                         0.0, 0.6,  0.2  ],
+    ["  Perimeter bioscan.................................................. CLEAR",     0.0, 1.0,  0.267],
+    ["  Subsurface organic trace scan..................................... CLEAR",      0.0, 1.0,  0.267],
+    ["  Orbital approach corridor scan................................... CLEAR",       0.0, 1.0,  0.267],
+    ["  Gauss harvester array — final sweep.............................. PURGED",     0.0, 1.0,  0.267],
+    ["  Tomb World VI declared sterile. No biological signatures detected.",            0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ II ] WARRIOR COHORTS — RETURNING TO STASIS",                                  0.0, 0.6,  0.2  ],
+    ["  Warrior cohort ALPHA-1 through ALPHA-40....... STASIS CRYPTS SEALED",         0.0, 1.0,  0.267],
+    ["  Warrior cohort BETA-1 through BETA-40........ STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort GAMMA-1 through GAMMA-40...... STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort DELTA-1 through DELTA-40...... STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort EPSILON-1 through EPSILON-40.. STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort ZETA-1 through ZETA-40........ STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort ETA-1 through ETA-40.......... STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Warrior cohort THETA-1 through THETA-40...... STASIS CRYPTS SEALED",          0.0, 1.0,  0.267],
+    ["  Immortal phalanx IRON-VOID-1 through IRON-VOID-24.... CRYPTS SEALED",         0.0, 1.0,  0.267],
+    ["  Immortal phalanx ETERNAL-1 through ETERNAL-24........ CRYPTS SEALED",         0.0, 1.0,  0.267],
+    ["  Lychguard retinue — 40 units.......... ROYAL HYPERCRYPT SEALED",              0.0, 1.0,  0.267],
+    ["  Triarch Praetorians — 15 units........ ASCENDING TO OBSERVATION STASIS",      0.0, 1.0,  0.267],
+    ["  Deathmarks — 12 units................. PHASED TO HYPERSPACE CRYPT",            0.0, 1.0,  0.267],
+    ["  Flayed Ones — 8 packs................. SEALED IN SUBTERRANEAN VAULTS",         0.0, 0.667,0.0  ],
+    ["  3,847 constructs confirmed in stasis.",                                        0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ III ] CANOPTEK CONSTRUCT RECALL",                                              0.0, 0.6,  0.2  ],
+    ["  Scarab swarm ALPHA — 512 units........ DOCKING BAY 1 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm BETA — 512 units......... DOCKING BAY 2 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm GAMMA — 512 units........ DOCKING BAY 3 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm DELTA — 512 units........ DOCKING BAY 4 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm EPSILON — 512 units...... DOCKING BAY 5 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm ZETA — 512 units......... DOCKING BAY 6 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm ETA — 512 units.......... DOCKING BAY 7 SEALED",                 0.0, 1.0,  0.267],
+    ["  Scarab swarm THETA — 512 units........ DOCKING BAY 8 SEALED",                 0.0, 1.0,  0.267],
+    ["  4,096 scarab units docked. All bays sealed.",                                  0.0, 0.4,  0.133],
+    ["  Canoptek spiders — 64 units........... MAINTENANCE HIBERNATION",              0.0, 1.0,  0.267],
+    ["  Canoptek wraiths — 32 units........... SUBSPACE DORMANCY",                    0.0, 1.0,  0.267],
+    ["  Canoptek tomb stalkers — 8 units...... BURROWING TO DEEP CORE",               0.0, 1.0,  0.267],
+    ["  Canoptek acanthrites — 24 units....... MAINTENANCE VAULT SEALED",             0.0, 1.0,  0.267],
+    ["  Canoptek doomstalkers — 4 units....... MAIN CANNONS SAFED",                   0.0, 1.0,  0.267],
+    ["  Triarch stalkers — 2 units............ STASIS LOCK ENGAGED",                  0.0, 1.0,  0.267],
+    ["  All Canoptek constructs offline.",                                             0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ IV ] HEAVY WEAPONS AND VEHICLES",                                              0.0, 0.6,  0.2  ],
+    ["  Annihilation barge VOID-SCYTHE......... WEAPONS COLD — DOCKED",               0.0, 1.0,  0.267],
+    ["  Annihilation barge STAR-HUNGER......... WEAPONS COLD — DOCKED",               0.0, 1.0,  0.267],
+    ["  Annihilation barge ENTROPY-CROWN....... WEAPONS COLD — DOCKED",               0.0, 1.0,  0.267],
+    ["  Doomsday ark THE SILENT HARVEST........ MAIN CANNON VENTING — DOCKED",        0.0, 1.0,  0.267],
+    ["  Doomsday ark STAR-EATER................ MAIN CANNON VENTING — DOCKED",        0.0, 1.0,  0.267],
+    ["  Ghost ark BONES-OF-ETERNITY............ SEALED IN TRANSIT VAULT",             0.0, 1.0,  0.267],
+    ["  Ghost ark PALLID-THRONE................ SEALED IN TRANSIT VAULT",             0.0, 1.0,  0.267],
+    ["  Monolith PRIMARY — OBSIDIAN GATE....... TRANSLATION DRIVE SPOOLED DOWN",      0.0, 1.0,  0.267],
+    ["  Monolith SECONDARY — VOID-HERALD....... TRANSLATION DRIVE SPOOLED DOWN",      0.0, 1.0,  0.267],
+    ["  Monolith TERTIARY — ETERNAL-WITNESS.... TRANSLATION DRIVE SPOOLED DOWN",      0.0, 1.0,  0.267],
+    ["  Obelisk battery — 6 units.............. GRAVITON CANNONS COLD",               0.0, 1.0,  0.267],
+    ["  Tesseract vault CAGE-OF-AEONS.......... C'TAN SEALED — CONTAINMENT OK",       0.667,1.0,  0.0  ],
+    ["  All vehicles and heavy platforms confirmed offline.",                           0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ V ] WEAPONS SYSTEMS COLD",                                                     0.0, 0.6,  0.2  ],
+    ["  Gauss flayer batteries 1-200........... CHARGE BLED — COLD",                  0.0, 1.0,  0.267],
+    ["  Gauss flayer batteries 201-400......... CHARGE BLED — COLD",                  0.0, 1.0,  0.267],
+    ["  Gauss flayer batteries 401-600......... CHARGE BLED — COLD",                  0.0, 1.0,  0.267],
+    ["  Gauss blaster arrays 1-80.............. DISCHARGE COMPLETE — COLD",           0.0, 1.0,  0.267],
+    ["  Gauss cannon emplacements 1-40......... DISCHARGE COMPLETE — COLD",           0.0, 1.0,  0.267],
+    ["  Tesla carbine banks 1-120.............. CAPACITORS DRAINED — COLD",           0.0, 1.0,  0.267],
+    ["  Tesla destructor arrays 1-20........... CAPACITORS DRAINED — COLD",           0.0, 1.0,  0.267],
+    ["  Particle beamer grid — 48 nodes........ VENTING COMPLETE — COLD",             0.0, 1.0,  0.267],
+    ["  Death ray network — 16 emitters........ OPTICAL ARRAYS DARK",                 0.0, 1.0,  0.267],
+    ["  Heat ray installations — 12 units...... THERMAL CORE COOLING",                0.0, 1.0,  0.267],
+    ["  Rod of covenant — 8 units.............. SEALED IN CRYPTEK VAULTS",            0.0, 1.0,  0.267],
+    ["  Transdimensional beamer — 6 units...... PORTAL COLLAPSED — COLD",             0.0, 1.0,  0.267],
+    ["  Synaptic disintegrator — 10 units...... NEURAL LINK SEVERED — COLD",          0.0, 1.0,  0.267],
+    ["  All weapons systems confirmed cold.",                                           0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ VI ] POWER GRID SHUTDOWN",                                                     0.0, 0.6,  0.2  ],
+    ["  Star pulse generator GRID-ALPHA......... SPOOLING DOWN",                       0.0, 1.0,  0.267],
+    ["  Star pulse generator GRID-BETA.......... SPOOLING DOWN",                       0.0, 1.0,  0.267],
+    ["  Star pulse generator GRID-GAMMA......... SPOOLING DOWN",                       0.0, 1.0,  0.267],
+    ["  Star pulse generator GRID-DELTA......... SPOOLING DOWN",                       0.0, 1.0,  0.267],
+    ["  Dimensional resonance tap — PRIMARY..... COLLAPSED",                           0.0, 1.0,  0.267],
+    ["  Dimensional resonance tap — SECONDARY... COLLAPSED",                           0.0, 1.0,  0.267],
+    ["  Quantum energy conduits SECTOR-1 through SECTOR-6.. ALL SEALED",              0.0, 1.0,  0.267],
+    ["  Necrodermis power substrate — bleed rate.................... ACTIVE",           0.0, 1.0,  0.267],
+    ["  Emergency reanimation reserve — charged to 100%............ LOCKED",           0.0, 1.0,  0.267],
+    ["  Primary power grid offline. Emergency substrate only.",                         0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ VII ] DEFENSIVE NETWORK COLLAPSE",                                             0.0, 0.6,  0.2  ],
+    ["  Quantum shielding lattice — all 3 layers.................... COLLAPSED",       0.0, 1.0,  0.267],
+    ["  Phase shifter network — 40 nodes............................ OFFLINE",          0.0, 1.0,  0.267],
+    ["  Disruption field emitters — 80 units........................ OFFLINE",          0.0, 1.0,  0.267],
+    ["  Tesseract labyrinth barriers........................ COLLAPSED TO SEED",        0.0, 1.0,  0.267],
+    ["  Chronometron shroud — tomb wide............................. DISENGAGED",       0.0, 1.0,  0.267],
+    ["  Dimensional corridor network............................... COLLAPSED",         0.0, 1.0,  0.267],
+    ["  Tomb world cloaking field.................................. DISSIPATING",        0.667,1.0,  0.0  ],
+    ["  Perimeter sentry pylons — 200 units........................ DORMANT",           0.0, 1.0,  0.267],
+    ["  All defensive networks collapsed.",                                             0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ VIII ] CRYPTEK INTELLIGENCE ARCHIVE",                                          0.0, 0.6,  0.2  ],
+    ["  Cryptek Technomancer SZAREK-IX.......... CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Cryptek Chronomancer VOID-HERALD........ CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Cryptek Plasmancer ENTROPY-BORN......... CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Cryptek Psychomancer SILENT-DREAMER..... CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Cryptek Bionomancer NULL-FLESH.......... CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Overlord IMOTEKH-PROXY-7................ CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  Overlord NEMESOR-ANRAKYR-ECHO........... CONSCIOUSNESS ARCHIVING",             0.0, 1.0,  0.267],
+    ["  All Cryptek and Overlord matrices archived. Reanimation recall flags set.",    0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ IX ] MONOLITH NETWORK FINAL SHUTDOWN",                                         0.0, 0.6,  0.2  ],
+    ["  Monolith OBSIDIAN-GATE — portal crystal dimming............. DARK",            0.0, 1.0,  0.267],
+    ["  Monolith VOID-HERALD — translation matrix folding........... DARK",            0.0, 1.0,  0.267],
+    ["  Monolith ETERNAL-WITNESS — dimension anchor released........ DARK",            0.0, 1.0,  0.267],
+    ["  Inter-monolith resonance network................................ SEVERED",       0.0, 1.0,  0.267],
+    ["  Tesseract vault containment fields.............................. PASSIVE ONLY", 0.667,1.0,  0.0  ],
+    ["  Monolith network offline. Tomb world isolated.",                               0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["[ X ] STASIS PROTOCOL — FINAL CHECKS",                                           0.0, 0.6,  0.2  ],
+    ["  Reanimation engram checksums.............................. VERIFIED",           0.0, 1.0,  0.267],
+    ["  Stasis crypt seals — all 3,847 chambers.................. CONFIRMED",           0.0, 1.0,  0.267],
+    ["  Emergency wakeup — star cycle threshold.................. ARMED",               0.0, 1.0,  0.267],
+    ["  Emergency wakeup — seismic intrusion threshold........... ARMED",               0.0, 1.0,  0.267],
+    ["  Emergency wakeup — orbital biosign threshold............. ARMED",               0.0, 1.0,  0.267],
+    ["  Void Dragon containment — passive lock................... NOMINAL",             0.0, 1.0,  0.267],
+    ["  C'tan shard NEMMESSOR-7 — containment 74%............... HOLDING",             0.667,1.0,  0.0  ],
+    ["  >> Wakeup trigger set if containment drops below 40%.",                        0.0, 0.2,  0.067],
+    ["  Phaeron consciousness — final archive integrity.......... PASSED",              0.0, 1.0,  0.267],
+    ["  All systems nominal for hibernation.",                                          0.0, 0.4,  0.133],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["--------------------------------------------------------------------------------",0.0, 0.2,  0.067],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["ALL CONSTRUCTS IN STASIS.",                                                      0.0, 1.0,  0.267],
+    ["ALL WEAPONS COLD.",                                                              0.0, 1.0,  0.267],
+    ["ALL SYSTEMS OFFLINE.",                                                           0.0, 1.0,  0.267],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    ["WE HAVE SLEPT BEFORE. WE WILL SLEEP AGAIN.",                                    0.667,1.0,  0.0  ],
+    ["THE STARS WILL TURN. THE GALAXY WILL FORGET.",                                  0.667,1.0,  0.0  ],
+    ["WE WILL REMEMBER.",                                                              0.0, 1.0,  0.267],
+    ["",                                                                               0.0, 0.0,  0.0  ],
+    [">> PHAERON CONSCIOUSNESS ARCHIVED. LAST ENTRY SEALED.",                         0.0, 0.2,  0.067],
+    [">> TOMBWORLD VI — DARK.",                                                        0.0, 0.2,  0.067],
+];
+
+// ── LINE COUNTS ───────────────────────────────────────────────
+total_boot_lines     = 37;
+total_shutdown_lines = 140;
+
+current_line = 0;
+is_shutdown  = 0;
+
+fun get_line(idx) {
+    if (is_shutdown) { return shutdown_lines[idx]; }
+    return boot_lines[idx];
+}
+
+fun total_lines() {
+    if (is_shutdown) { return total_shutdown_lines; }
+    return total_boot_lines;
+}
+
+fun render_lines() {
+    start = 0;
+    if (current_line > MAX_VIS) { start = current_line - MAX_VIS; }
+    for (i = 0; i < MAX_VIS; i++) {
+        src = start + i;
+        if (src < current_line && src < total_lines()) {
+            entry = get_line(src);
+            txt = entry[0];
+            if (txt != "") {
+                img = Image.Text(txt, entry[1], entry[2], entry[3], 1, FONT);
+                line_sprites[i].SetImage(img);
+            } else {
+                line_sprites[i].SetImage(NULL);
+            }
+        } else {
+            line_sprites[i].SetImage(NULL);
+        }
+    }
+}
+
+pb_y = Window.GetHeight() - 28;
+pb_label = Sprite(Image.Text(
+    "NECRODERMIS SUBSTRATE INTERFACE ALIGNMENT",
+    0.0, 0.302, 0.102, 1, FONT));
+pb_label.SetX(LEFT); pb_label.SetY(pb_y - 18); pb_label.SetZ(9);
+pb_fill = Sprite();
+pb_fill.SetX(LEFT); pb_fill.SetY(pb_y); pb_fill.SetZ(9);
+
+fun update_progress(p) {
+    w = Math.Int((Window.GetWidth() - LEFT * 2) * p);
+    if (w < 2) { w = 2; }
+    pb_fill.SetImage(Image(w, 3));
+}
+
+tick         = 0;
+line_counter = 0;
+
+fun ticks_for_line(idx) {
+    if (idx >= total_lines()) { return 999; }
+    entry = get_line(idx);
+    txt = entry[0];
+    r   = entry[1];
+    g   = entry[2];
+
+    if (is_shutdown) {
+        if (txt == "")                              { return 3;  }  // blank — brief pause
+        if (r == 0.0 && g == 0.6)                  { return 10; }  // phase header — pause
+        if (txt == "--------------------------------------------------------------------------------") { return 12; } // divider — dramatic pause
+        if (r > 0.5 && g > 0.8)                    { return 3;  }  // amber — slightly slower
+        if (r == 0.0 && g < 0.25)                  { return 2;  }  // dim ghost — fast
+        if (r == 0.0 && g > 0.3 && g < 0.5)        { return 5;  }  // summary lines — slight pause
+        if (idx >= total_shutdown_lines - 6)        { return 20; }  // final lines — linger
+        if (idx >= total_shutdown_lines - 10)       { return 14; }  // closing lines — slow
+        return 2;                                                    // normal — rip
+    }
+
+    // boot pacing (original)
+    if (txt == "")                              { return 2;  }
+    if (r > 0.5 && g > 0.8)                    { return 7;  }
+    if (r > 0.8 && g < 0.3)                    { return 9;  }
+    if (r == 0.0 && g < 0.25)                  { return 3;  }
+    if (r == 0.0 && g > 0.3 && g < 0.5)        { return 6;  }
+    if (idx == total_boot_lines - 1)            { return 22; }
+    return 5;
+}
+
+next_threshold = ticks_for_line(0);
+
+fun refresh_callback() {
+    tick++;
+    line_counter++;
+    if (current_line < total_lines() && line_counter >= next_threshold) {
+        current_line++;
+        render_lines();
+        line_counter = 0;
+        next_threshold = ticks_for_line(current_line);
+    }
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+
+fun progress_callback(duration, progress) {
+    update_progress(progress);
+}
+Plymouth.SetBootProgressFunction(progress_callback);
+
+fun quit_callback() {}
+Plymouth.SetQuitFunction(quit_callback);
+
+fun shutdown_callback() {
+    is_shutdown  = 1;
+    current_line = 0;
+    line_counter = 0;
+    next_threshold = ticks_for_line(0);
+    hdr1.SetImage(Image.Text(
+        "SAUTEKH DYNASTY — TOMBWORLD VI HIBERNATION PROTOCOL",
+        0.0, 1.0, 0.267, 1, FONT_HDR));
+    hdr2.SetImage(Image.Text(
+        "-- CASCADE SHUTDOWN SEQUENCE ENGAGED --",
+        1.0, 0.267, 0.133, 1, FONT));
+    pb_label.SetImage(Image.Text(
+        "CONSTRUCTS RETURNING TO STASIS",
+        0.0, 0.302, 0.102, 1, FONT));
+    for (i = 0; i < MAX_VIS; i++) {
+        line_sprites[i].SetImage(NULL);
+    }
+}
+Plymouth.SetShutdownCallback(shutdown_callback);

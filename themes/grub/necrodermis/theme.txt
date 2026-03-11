@@ -1,0 +1,127 @@
+# ============================================================
+# SAUTEKH DYNASTY — GRUB THEME
+# Resolution: 2560x1440
+# Font: VT323 (convert with setup.sh)
+# ============================================================
+
+desktop-image: "background.png"
+desktop-color: "#0a0a0a"
+title-text: ""
+terminal-font: "Terminus Regular 20"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
+
+# ── TITLE ────────────────────────────────────────────────────
++ label {
+  top    = 3%
+  left   = 0
+  width  = 57%
+  height = 30
+  text   = "-- REANIMATION PROTOCOL SELECTION --"
+  font   = "Terminus Regular 18"
+  color  = "#004d1a"
+  align  = "center"
+}
+
+# ── BOOT MENU ────────────────────────────────────────────────
++ boot_menu {
+  left   = 3%
+  top    = 14%
+  width  = 54%
+  height = 42%
+
+  item_font              = "Terminus Regular 22"
+  item_color             = "#006622"
+  item_height            = 36
+  item_padding           = 10
+  item_spacing           = 5
+
+  selected_item_font     = "Terminus Regular 22"
+  selected_item_color    = "#00ff44"
+
+  item_pixmap_style      = "select_*.png"
+
+  icon_width             = 16
+  icon_height            = 16
+  item_icon_space        = 12
+
+  scrollbar              = false
+}
+
+# ── STATUS / COUNTDOWN LABEL ─────────────────────────────────
++ label {
+  id     = "__timeout__"
+  top    = 60%
+  left   = 3%
+  width  = 54%
+  height = 20
+  text   = "INITIATING REANIMATION IN %d CYCLES..."
+  font   = "Terminus Regular 15"
+  color  = "#00aa33"
+  align  = "center"
+}
+
+# ── PROGRESS BAR ─────────────────────────────────────────────
++ progress_bar {
+  id              = "__timeout__"
+  left            = 3%
+  top             = 66%
+  width           = 54%
+  height          = 3
+
+  fg_color        = "#00ff44"
+  bg_color        = "#001208"
+  border_color    = "#003311"
+
+  bar_style       = "progress_*.png"
+}
+
+# ── TOMBWORLDS AWAKENED ───────────────────────────────────────
++ label {
+  top    = 82%
+  left   = 3%
+  width  = 200
+  height = 16
+  text   = "TOMBWORLDS AWAKENED"
+  font   = "Terminus Regular 13"
+  color  = "#004d1a"
+  align  = "left"
+}
+
++ label {
+  top    = 86%
+  left   = 3%
+  width  = 200
+  height = 50
+  text   = "$boot_count"
+  font   = "Terminus Regular 38"
+  color  = "#00ff44"
+  align  = "left"
+}
+
+# ── THE SILENT KING ───────────────────────────────────────────
++ label {
+  top    = 94%
+  left   = 0
+  width  = 60%
+  height = 16
+  text   = "THE SILENT KING AWAITS"
+  font   = "Terminus Regular 12"
+  color  = "#002208"
+  align  = "center"
+}
+
+# ── HINT ─────────────────────────────────────────────────────
++ label {
+  top    = 94%
+  left   = 60%
+  width  = 37%
+  height = 16
+  text   = "[UP/DOWN] SELECT  [ENTER] BOOT  [E] EDIT  [C] CMD"
+  font   = "Terminus Regular 11"
+  color  = "#1a1a1a"
+  align  = "right"
+}

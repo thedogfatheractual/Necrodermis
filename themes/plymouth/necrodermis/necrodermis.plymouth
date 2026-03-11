@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Sautekh Dynasty
+Description=Necron Sautekh Dynasty boot sequence — scrolling reanimation protocol lines
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/necrodermis
+ScriptFile=/usr/share/plymouth/themes/necrodermis/necrodermis.script
