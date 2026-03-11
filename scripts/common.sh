@@ -223,3 +223,25 @@ WRAPPER
     print_ok "Uninstaller deployed  ${DG}//  $NECRO_HOME/uninstall.sh${NC}"
     print_ok "Command registered    ${DG}//  necrodermis-uninstall${NC}"
 }
+
+# ── NECRO_PRINT — LABELED COMPONENT MESSAGE ──
+# Usage: necro_print "component" "message"
+necro_print() {
+    local label="$1"
+    local msg="$2"
+    echo -e "  ${G}[${label}]${NC}  $msg"
+}
+
+# ── NECRO_BACKUP — STANDALONE DIRECTORY BACKUP ──
+# Usage: necro_backup "/path/to/dir"
+# Archives target to BACKUP_DIR — no install, just archive
+necro_backup() {
+    local target="$1"
+    if [ -e "$target" ]; then
+        mkdir -p "$BACKUP_DIR"
+        local name
+        name="$(basename "$target")_$(date +%Y%m%d_%H%M%S)"
+        cp -r "$target" "$BACKUP_DIR/$name"
+        print_info "archived  //  $BACKUP_DIR/$name"
+    fi
+}
