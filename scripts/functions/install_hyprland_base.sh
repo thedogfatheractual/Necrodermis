@@ -45,7 +45,6 @@ install_hyprland_base() {
         swww \
         wl-clipboard \
         cliphist \
-        wlogout
 
     # ── Audio / media ─────────────────────────────────────────
     print_info "Calibrating resonance arrays  //  audio substrate online..."
@@ -56,7 +55,7 @@ install_hyprland_base() {
         mpv
 
     print_info "Binding mpris scarab  //  media control layer..."
-    yay -S --needed --noconfirm mpv-mpris
+    yay -S --needed --noconfirm mpv-mpris wlogout
 
     # ── System utilities ──────────────────────────────────────
     print_info "Deploying utility scarabs  //  tomb maintenance complement..."
