@@ -31,7 +31,7 @@ install_firewall() {
     # ── DEFAULT POLICIES ──
     sudo ufw default deny incoming
     sudo ufw default allow outgoing
-    sudo ufw default deny forward
+    sudo ufw default allow forward
     print_ok "Default policies set  ${DG}//  deny incoming // allow outgoing${NC}"
 
     # ── LOOPBACK ──
@@ -39,6 +39,13 @@ install_firewall() {
     sudo ufw deny in from 127.0.0.0/8
     sudo ufw deny in from ::1
     print_ok "Loopback rules set  ${DG}//  localhost traffic permitted${NC}"
+
+    # ── LIBVIRT / KVM (virbr0 — VM networking) ──
+    sudo ufw allow in on virbr0
+    sudo ufw allow out on virbr0
+    sudo ufw route allow in on virbr0
+    sudo ufw route allow out on virbr0
+    print_ok "virbr0 permitted  ${DG}//  KVM VM networking active${NC}"
 
     # ── STEAM (scoped to LAN — Remote Play) ──
     sudo ufw allow from "$LAN_SUBNET" to any port 27036 proto tcp comment "Steam Remote Play TCP"
