@@ -186,17 +186,28 @@ case "$mode" in
         check_deps
         run_selective
         ;;
-# ════════════════════════════════════════════════════════════
-# NECRODERMIS — SAUTEKH DYNASTY // v0.1.0
-# Install Script — Arch / CachyOS / Manjaro / EndeavourOS
-# https://github.com/thedogfatheractual/Necrodermis
-#
-# STASIS DURATION: 60,247,891 YRS  //  47 MAINTENANCE FAULTS UNRESOLVED
-# LAST DIAGNOSTIC: 4,891 YEARS AGO  //  TOMB INTEGRITY BREACH DETECTED
-# ════════════════════════════════════════════════════════════
+esac
 
+bundle_uninstaller
 
-set -e
+echo ""
+echo -e "${G}${B}"
+echo "  ╔══════════════════════════════════════════════════════════════╗"
+echo "  ║           NECRODERMIS INSTALLATION COMPLETE                  ║"
+echo "  ║           ALL SYSTEMS NOMINAL  //  TOMB WORLD VI ONLINE      ║"
+echo "  ╚══════════════════════════════════════════════════════════════╝"
+echo -e "${NC}"
+echo -e "  ${DG}  Configuration archive: ${G}${BACKUP_DIR}${NC}"
+echo ""
+echo -e "  ${DG}  TO UNINSTALL NECRODERMIS:${NC}"
+echo -e "  ${G}    necrodermis-uninstall${NC}"
+echo ""
+echo -e "  ${DG}  Log out and back in for all changes to take effect.${NC}"
+echo ""
+echo -e "  ${DG}  The silent king stirs. The stars remember.${NC}"
+echo ""
+echo -e "${G}${B}  ORGANIC MATTER IS TEMPORARY  //  NECRODERMIS IS ETERNAL${NC}"
+echo ""
 
 # ── DEBUG MODE ──
 NECRO_DEBUG=0
@@ -367,28 +378,12 @@ case "$mode" in
             exit 0
         fi
         ;;
-esac
-
-bundle_uninstaller
-
-echo ""
-echo -e "${G}${B}"
-echo "  ╔══════════════════════════════════════════════════════════════╗"
-echo "  ║           NECRODERMIS INSTALLATION COMPLETE                  ║"
-echo "  ║           ALL SYSTEMS NOMINAL  //  TOMB WORLD VI ONLINE      ║"
-echo "  ╚══════════════════════════════════════════════════════════════╝"
-echo -e "${NC}"
-echo -e "  ${DG}  Configuration archive: ${G}${BACKUP_DIR}${NC}"
-echo ""
-echo -e "  ${DG}  TO UNINSTALL NECRODERMIS:${NC}"
-echo -e "  ${G}    necrodermis-uninstall${NC}"
-echo ""
-echo -e "  ${DG}  Log out and back in for all changes to take effect.${NC}"
-echo ""
-echo -e "  ${DG}  The silent king stirs. The stars remember.${NC}"
-echo ""
-echo -e "${G}${B}  ORGANIC MATTER IS TEMPORARY  //  NECRODERMIS IS ETERNAL${NC}"
-echo ""
+    *)
+        print_section "THEME INSTALLATION MODE  //  DERMAL LAYER ONLY"
+        configure_timezone
+        check_deps
+        run_selective
+        ;;
 esac
 
 bundle_uninstaller

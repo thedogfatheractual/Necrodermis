@@ -91,6 +91,8 @@ rainbow_borders_menu() {
                 sed -i '1a EFFECT_TYPE="'"$mode"'"' "$rainbow_script"
             fi
             ;;
+    esac
+}
 
 # ── SUBMENUS ──────────────────────────────────────────────────────────────────
 menu_user_configs() {
@@ -155,11 +157,6 @@ menu_utilities() {
         "Rainbow Borders")      rainbow_borders_menu ;;
         "Restore Configs")      bash "$NECRO_REPO/nd-restore.sh" ;;
         "System Update / Clean") bash "$HYPR_SCRIPTS/nd-update.sh" ;;
-    esac
-}
-
-# ── MAIN MENU ─────────────────────────────────────────────────────────────────
-while true; do
     esac
 }
 
