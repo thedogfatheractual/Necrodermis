@@ -33,7 +33,6 @@ install_plymouth() {
 
     # ── INITRAMFS REBUILD ──
     if [ -f /etc/mkinitcpio.conf ]; then
-        # mkinitcpio system (most Arch installs)
         if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
             sudo cp /etc/mkinitcpio.conf /etc/mkinitcpio.conf.necrodermis-backup
             sudo sed -i 's/\(HOOKS=.*\budev\b\)/\1 plymouth/' /etc/mkinitcpio.conf
@@ -45,10 +44,21 @@ install_plymouth() {
         sudo mkinitcpio -P
         print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
     elif command -v dracut &>/dev/null; then
-        # dracut system (some EndeavourOS / CachyOS installs)
         print_info "dracut detected  //  rebuilding initramfs..."
-        sudo dracut --force
-        print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
+        # Ensure EFI output directories exist before dracut runs
+        local kernel_ver
+        kernel_ver=$(uname -r)
+        local machine_id
+        machine_id=$(cat /etc/machine-id 2>/dev/null || echo "")
+        if [ -n "$machine_id" ]; then
+            sudo mkdir -p "/boot/efi/${machine_id}/${kernel_ver}"
+        fi
+        if sudo dracut --force 2>&1; then
+            print_ok "Initramfs rebuilt  ${DG}//  splash protocol armed${NC}"
+        else
+            print_err "dracut failed  //  splash will activate after manual initramfs rebuild"
+            print_info "Run manually: sudo dracut --force"
+        fi
     else
         print_err "Neither mkinitcpio nor dracut found  //  rebuild initramfs manually after install"
     fi
