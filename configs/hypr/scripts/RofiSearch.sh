@@ -37,7 +37,7 @@ if pgrep -x "rofi" >/dev/null; then
 fi
 
 # Open Rofi and pass the selected query to xdg-open for the configured search engine
-query=$(printf '' | rofi -dmenu -config "$rofi_theme" -mesg "$msg")
+query=$(printf '' | rofi -dmenu -config "$rofi_theme" -mesg "[NECRODERMIS // CANOPTEK PROTOCOLS]")
 
 if [[ -z "$query" ]]; then
     exit 0

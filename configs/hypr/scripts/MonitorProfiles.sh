@@ -29,7 +29,7 @@ for ignored_file in "${ignore_files[@]}"; do
 done
 
 # Rofi Menu
-chosen_file=$(echo "$mon_profiles_list" | rofi -i -dmenu -config $rofi_theme -mesg "$msg")
+chosen_file=$(echo "$mon_profiles_list" | rofi -i -dmenu -config $rofi_theme -mesg "[NECRODERMIS // CANOPTEK PROTOCOLS]")
 
 if [[ -n "$chosen_file" ]]; then
     full_path="$monitor_dir/$chosen_file.conf"

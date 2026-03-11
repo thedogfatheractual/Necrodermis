@@ -20,7 +20,7 @@ while true; do
             -kb-custom-1 "Control-Delete" \
             -kb-custom-2 "Alt-Delete" \
             -config $rofi_theme < <(cliphist list) \
-			-mesg "$msg" 
+			-mesg "[NECRODERMIS // CANOPTEK PROTOCOLS]" 
     )
 
     case "$?" in

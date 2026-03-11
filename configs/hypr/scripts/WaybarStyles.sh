@@ -44,7 +44,7 @@ main() {
     choice=$(printf '%s\n' "${options[@]}" \
         | rofi -i -dmenu \
                -config "$rofi_config" \
-               -mesg "$msg" \
+               -mesg "[NECRODERMIS // CANOPTEK PROTOCOLS]" \
                -selected-row "$default_row"
     )
 

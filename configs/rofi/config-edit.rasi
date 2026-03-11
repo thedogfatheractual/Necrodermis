@@ -1,5 +1,5 @@
-/* ---- 💫 https://github.com/JaKooLit 💫 ---- */
-/* KooL Hyprland Edit Rofi Config */
+/* ---- NECRODERMIS — SAUTEKH DYNASTY ---- */
+/* Canoptek Protocols — Edit Config */
 
 @import "~/.config/rofi/config.rasi"  
 
@@ -35,7 +35,7 @@ listview {
 /* ---- Entry input ---- */
 entry {
   expand: true;
-  placeholder: " 💫  Customize KooL Hyprland  💫";
+  placeholder: "▸ CANOPTEK SEARCH PROTOCOL ◂";
   horizontal-align: 0.5;
 }
 

@@ -36,4 +36,4 @@ if [[ -f "/tmp/hypr_keybind_suggestions_file" ]]; then
 fi
 
 # use rofi to display the keybinds
-printf '%s\n' "$display_keybinds" | rofi -dmenu -i -config "$rofi_theme" -mesg "$msg"
+printf '%s\n' "$display_keybinds" | rofi -dmenu -i -config "$rofi_theme" -mesg "[NECRODERMIS // CANOPTEK PROTOCOLS]"
