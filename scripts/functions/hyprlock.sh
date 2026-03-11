@@ -13,7 +13,7 @@ install_hyprlock() {
 
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local CONFIG_DIR="$SCRIPT_DIR/../../config"
+    local CONFIG_DIR="$SCRIPT_DIR/../../installer"
 
     necro_print "hyprlock" "Configuring hyprlock..."
 
