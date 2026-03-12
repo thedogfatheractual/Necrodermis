@@ -9,7 +9,7 @@
 # ════════════════════════════════════════════════════════════
 
 
-set -e
+# set -e  # removed — triage handles failures
 
 # ── DEBUG MODE ──
 NECRO_DEBUG=0
