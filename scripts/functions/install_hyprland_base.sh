@@ -9,6 +9,7 @@ install_hyprland_base() {
 
     necro_tui_init \
         "base-prereqs|Base Prerequisites" \
+        "spasskaya-clocks|Spasskaya Clocks" \
         "hyprland-core|Hyprland Core" \
         "hyprpolkitagent|Polkit Agent" \
         "wayland-plumbing|Wayland Plumbing" \
@@ -24,8 +25,53 @@ install_hyprland_base() {
     necro_pkg "base-prereqs" base-devel archlinux-keyring findutils curl wget unzip git tmux
     necro_tui_stage_set "base-prereqs" "OK"
 
+    # ── Spasskaya Clocks — optional ──────────────────────────
+    necro_tui_stage_set "spasskaya-clocks" "ACTIVE"
+    echo ""
+    echo -e "  ${G}${B}  ┌─ Spasskaya Clocks  //  OPTIONAL ──────────────────────────────${NC}"
+    echo -e "  ${DG}  │  Plays Kremlin clocktower chimes at :00 and :30 via cron.${NC}"
+    echo -e "  ${DG}  │  Includes the Spasskaya Tower melody + hourly strikes.${NC}"
+    echo -e "  ${DG}  │  Additional chime packs (Westminster etc) can be added later.${NC}"
+    echo -e "  ${DG}  │  Requires: ffmpeg, cronie${NC}"
+    echo -e "  ${G}${B}  └──────────────────────────────────────────────${NC}"
+    echo ""
+
+    local spas_choice
+    if [[ -z "${WAYLAND_DISPLAY:-}" && -z "${DISPLAY:-}" ]]; then
+        spas_choice="NO"
+        print_info "TTY mode  //  skipping Spasskaya Clocks"
+    else
+        spas_choice=$(
+            gum choose \
+                --header="  Install Spasskaya Clocks?" \
+                --header.foreground="2" \
+                --cursor.foreground="2" \
+                --selected.foreground="2" \
+                --item.foreground="7" \
+                "  NO   —  skip for now" \
+                "  YES  —  install clocktower chimes" \
+            2>/dev/null
+        ) || spas_choice="NO"
+    fi
+
+    if [[ "$spas_choice" == *"YES"* ]]; then
+        necro_pkg "spasskaya-clocks" ffmpeg cronie
+        local spas_tmp
+        spas_tmp=$(mktemp -d)
+        git clone --depth=1 git@github.com:thedogfatheractual/spasskaya-clocks.git "$spas_tmp" 2>/dev/null \
+            || git clone --depth=1 https://github.com/thedogfatheractual/spasskaya-clocks.git "$spas_tmp"
+        bash "$spas_tmp/install.sh" \
+            && necro_log "OK" "spasskaya-clocks" "Clocktower chimes installed" \
+            || necro_log "FAIL" "spasskaya-clocks" "Spasskaya install script failed"
+        rm -rf "$spas_tmp"
+        necro_tui_stage_set "spasskaya-clocks" "OK"
+    else
+        necro_log "SKIP" "spasskaya-clocks" "Spasskaya Clocks skipped by operator"
+        necro_tui_stage_set "spasskaya-clocks" "SKIP"
+        print_skip "Spasskaya Clocks  //  skipped"
+    fi
+
     print_info "Deploying Hyprland cortex  //  primary tomb systems online..."
-    necro_tui_stage_set "hyprland-core" "ACTIVE"
     necro_pkg_critical "hyprland-core" \
         hyprland hypridle hyprlock xdg-desktop-portal-hyprland xdg-user-dirs xdg-utils kitty
     necro_tui_stage_set "hyprland-core" "OK"
