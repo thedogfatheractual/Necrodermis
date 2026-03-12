@@ -1,5 +1,6 @@
 COMPONENTS=(
     "HyprlandBase|CORE|Full Hyprland dependency stack — run on bare Arch|install_hyprland_base"
+    "GPU Drivers|CORE|AMD · NVIDIA · Intel auto-detection|install_gpu_drivers"
     "Fonts|CORE|Terminess · Iosevka · SourceCodePro · Meslo|install_fonts"
     "Hyprland|CORE|Keybinds, decorations, window rules|install_hypr"
     "Hyprlock|CORE|Screen locker configuration|install_hyprlock"

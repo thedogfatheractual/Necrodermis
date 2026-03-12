@@ -57,3 +57,13 @@ detect_location_ip() {
     [ -z "$matched_icao" ] && return 1
     echo "${matched_icao}:${matched_city}"
 }
+
+detect_gpu() {
+    local gpu_info
+    gpu_info=$(lspci 2>/dev/null | grep -i "vga\|3d\|display")
+    if echo "$gpu_info" | grep -qi "nvidia"; then echo "nvidia"
+    elif echo "$gpu_info" | grep -qi "amd\|radeon"; then echo "amd"
+    elif echo "$gpu_info" | grep -qi "intel"; then echo "intel"
+    else echo "unknown"
+    fi
+}
