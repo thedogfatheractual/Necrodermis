@@ -5,6 +5,8 @@
 install_cava() {
     print_section "CAVA  //  AUDIO VISUALISER NODE"
 
+    necro_pkg "cava" cava
+
     local SRC="$SCRIPT_DIR/configs/cava"
     local DEST="$CONFIG_DIR/cava"
 

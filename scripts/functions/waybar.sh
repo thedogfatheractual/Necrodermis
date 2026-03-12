@@ -5,17 +5,17 @@
 install_waybar() {
     print_section "WAYBAR  //  STATUS ARRAY CALIBRATION"
 
+    necro_pkg "waybar" waybar
+
     local WAYBAR_SRC="$SCRIPT_DIR/configs/waybar"
     local WAYBAR_DEST="$CONFIG_DIR/waybar"
 
     necro_print "waybar" "Deploying status array configuration..."
 
-    # ── Backup existing waybar config ─────────────────────────────────────────
     if [ -d "$WAYBAR_DEST" ] && [ ! -L "$WAYBAR_DEST" ]; then
         necro_backup "$WAYBAR_DEST"
     fi
 
-    # ── Symlink entire waybar config directory ────────────────────────────────
     if [ -L "$WAYBAR_DEST" ]; then
         rm "$WAYBAR_DEST"
     fi

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Necrodermis — scripts/functions/rofi.sh
 # Component: install_rofi
+
 install_rofi() {
     print_section "ROFI  //  COMMAND INTERFACE NODE"
+
+    necro_pkg "rofi" rofi rofi-wayland
 
     local ROFI_SRC="$SCRIPT_DIR/configs/rofi"
     local ROFI_DEST="$CONFIG_DIR/rofi"

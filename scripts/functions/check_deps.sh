@@ -1,8 +1,11 @@
+#!/usr/bin/env bash
+# Necrodermis — scripts/functions/check_deps.sh
+
 check_deps() {
     print_section "PRE-FLIGHT DIAGNOSTIC  //  SCANNING TOMB SYSTEMS"
     echo ""
 
-    local deps=(git curl gcc make)
+    local deps=(git curl gcc make python3 gum)
     local missing=()
 
     for dep in "${deps[@]}"; do
@@ -30,10 +33,11 @@ check_deps() {
         for dep in "${missing[@]}"; do
             case "$dep" in
                 gcc|make) pkgs+=("base-devel") ;;
+                python3)  pkgs+=("python") ;;
+                gum)      pkgs+=("gum") ;;
                 *)        pkgs+=("$dep") ;;
             esac
         done
-        # deduplicate
         local unique_pkgs=($(printf '%s\n' "${pkgs[@]}" | sort -u))
         sudo pacman -S --needed --noconfirm "${unique_pkgs[@]}"
         echo ""

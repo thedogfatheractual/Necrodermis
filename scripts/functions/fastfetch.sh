@@ -5,6 +5,8 @@
 install_fastfetch() {
     print_section "FASTFETCH  //  SYSTEM READOUT NODE"
 
+    necro_pkg "fastfetch" fastfetch
+
     local SRC="$SCRIPT_DIR/configs/fastfetch"
     local DEST="$CONFIG_DIR/fastfetch"
 

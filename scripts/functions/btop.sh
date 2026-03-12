@@ -5,6 +5,8 @@
 install_btop() {
     print_section "BTOP  //  PROCESS MONITOR NODE"
 
+    necro_pkg "btop" btop
+
     local SRC="$SCRIPT_DIR/configs/btop"
     local DEST="$CONFIG_DIR/btop"
 

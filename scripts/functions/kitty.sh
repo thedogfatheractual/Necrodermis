@@ -5,6 +5,8 @@
 install_kitty() {
     print_section "KITTY  //  TERMINAL INTERFACE NODE"
 
+    necro_pkg "kitty" kitty
+
     local KITTY_SRC="$SCRIPT_DIR/configs/kitty"
     local KITTY_DEST="$CONFIG_DIR/kitty"
 

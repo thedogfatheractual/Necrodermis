@@ -5,6 +5,8 @@
 install_wlogout() {
     print_section "WLOGOUT  //  TOMB SEAL INTERFACE"
 
+    necro_yay "wlogout" wlogout
+
     local WLOGOUT_SRC="$SCRIPT_DIR/configs/wlogout"
     local WLOGOUT_DEST="$CONFIG_DIR/wlogout"
 

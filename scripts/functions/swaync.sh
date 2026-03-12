@@ -5,6 +5,8 @@
 install_swaync() {
     print_section "SWAYNC  //  NOTIFICATION RELAY NODE"
 
+    necro_yay "swaync" swaync
+
     local SWAYNC_SRC="$SCRIPT_DIR/configs/swaync"
     local SWAYNC_DEST="$CONFIG_DIR/swaync"
 

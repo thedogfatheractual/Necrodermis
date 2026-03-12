@@ -5,6 +5,9 @@
 install_qt() {
     print_section "QT  //  INTERFACE STYLING NODE"
 
+    necro_pkg "qt" qt5ct qt6ct
+    necro_yay "qt-kvantum" kvantum kvantum-qt5
+
     necro_print "qt" "Deploying configuration..."
 
     for component in qt5ct qt6ct Kvantum; do
