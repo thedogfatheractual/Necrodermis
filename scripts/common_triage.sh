@@ -602,3 +602,145 @@ necro_print_summary() {
         echo ""
     fi
 }
+
+# ════════════════════════════════════════════════════════════
+# NECRO_GROUP_INSTALL
+# ════════════════════════════════════════════════════════════
+# Presents a package group to the operator with three paths:
+#
+#   YES (default / timeout) → install all, no further prompts
+#   NO                      → offer checklist of individual packages
+#     select some           → install selected subset
+#     select none           → critical? → necro_critical_failure
+#                             normal?   → skip + log
+#
+# pkg_manager values:
+#   pacman           — sudo pacman, non-critical
+#   pacman_critical  — sudo pacman, critical failure on full skip
+#   yay              — yay/AUR, non-critical
+#   yay_critical     — yay/AUR, critical failure on full skip
+#
+# Usage:
+#   necro_group_install "Display Label" "component-id" "pacman" \
+#       pkg1 pkg2 pkg3
+#
+#   necro_group_install "Hyprland Core" "hyprland-core" "pacman_critical" \
+#       hyprland hypridle hyprlock
+# ════════════════════════════════════════════════════════════
+necro_group_install() {
+    local group_label="$1"
+    local component_id="$2"
+    local pkg_manager="$3"   # pacman | pacman_critical | yay | yay_critical
+    shift 3
+    local pkgs=("$@")
+
+    # ── Derive criticality from pkg_manager string ──
+    local is_critical="false"
+    [[ "$pkg_manager" == *"_critical" ]] && is_critical="true"
+
+    # ── Display group header ──
+    echo ""
+    echo -e "  ${G}${B}  ┌─ ${group_label} ─────────────────────────────────${NC}"
+    for pkg in "${pkgs[@]}"; do
+        echo -e "  ${DG}  │  · ${pkg}${NC}"
+    done
+    echo -e "  ${G}${B}  └──────────────────────────────────────────────${NC}"
+    echo ""
+
+    # ── PROMPT — default YES, auto-confirms after NECRO_NURSE_TIMEOUT ──
+    local group_answer
+    group_answer=$(
+        timeout "${NECRO_NURSE_TIMEOUT:-10}" \
+        gum choose \
+            --header="  Install group: ${group_label}?" \
+            --header.foreground="2" \
+            --cursor.foreground="2" \
+            --selected.foreground="2" \
+            --item.foreground="7" \
+            "  YES — INSTALL ALL  " \
+            "  NO  — LET ME CHOOSE  " \
+        2>/dev/null
+    ) || group_answer="timeout"
+
+    # ── YES or timeout → install all packages ──
+    if [[ "$group_answer" == "timeout" || "$group_answer" == *"YES"* ]]; then
+        necro_log "INFO" "$component_id" "Group install: ${group_label}  //  all packages"
+        _necro_group_do_install "$component_id" "$pkg_manager" "${pkgs[@]}"
+        return $?
+    fi
+
+    # ── NO → checklist of individual packages ──
+    echo ""
+    print_info "Select packages from ${group_label}  ${DG}//  SPACE=toggle  ENTER=confirm${NC}"
+    echo ""
+
+    local selected
+    selected=$(
+        printf '%s\n' "${pkgs[@]}" | \
+        gum choose --no-limit \
+            --selected="$(printf '%s,' "${pkgs[@]}")" \
+            --header="  ${group_label}  —  deselect packages you don't want" \
+            --header.foreground="2" \
+            --cursor.foreground="2" \
+            --selected.foreground="2" \
+            --item.foreground="8" \
+        2>/dev/null
+    )
+
+    # ── Nothing selected → skip or critical ──
+    if [[ -z "$selected" ]]; then
+        if [[ "$is_critical" == "true" ]]; then
+            necro_log "CRIT" "$component_id" \
+                "Critical group skipped by operator: ${group_label}"
+            necro_critical_failure \
+                "$component_id" \
+                "group install: ${group_label}" \
+                "operator declined group and selected no individual packages"
+        else
+            necro_log "SKIP" "$component_id" \
+                "Group skipped by operator: ${group_label}  //  ${pkgs[*]}"
+            print_skip "${group_label}  //  group skipped by operator"
+        fi
+        return 0
+    fi
+
+    # ── Install selected subset ──
+    local selected_pkgs=()
+    while IFS= read -r pkg; do
+        [[ -n "$pkg" ]] && selected_pkgs+=("$(echo "$pkg" | xargs)")
+    done <<< "$selected"
+
+    necro_log "INFO" "$component_id" \
+        "Group partial install: ${group_label}  //  ${selected_pkgs[*]}"
+    _necro_group_do_install "$component_id" "$pkg_manager" "${selected_pkgs[@]}"
+    return $?
+}
+
+
+# ── Internal dispatcher — routes to correct necro_pkg/yay wrapper ──
+_necro_group_do_install() {
+    local component_id="$1"
+    local pkg_manager="$2"
+    shift 2
+    local pkgs=("$@")
+
+    case "$pkg_manager" in
+        pacman_critical)
+            necro_pkg_critical "$component_id" "${pkgs[@]}"
+            ;;
+        pacman)
+            necro_pkg "$component_id" "${pkgs[@]}"
+            ;;
+        yay_critical)
+            necro_yay_critical "$component_id" "${pkgs[@]}"
+            ;;
+        yay)
+            necro_yay "$component_id" "${pkgs[@]}"
+            ;;
+        *)
+            print_err "necro_group_install: unknown pkg_manager '${pkg_manager}'"
+            necro_log "FAIL" "$component_id" "Unknown pkg_manager: ${pkg_manager}"
+            return 1
+            ;;
+    esac
+}

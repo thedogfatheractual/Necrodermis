@@ -10,7 +10,7 @@ install_hyprland_base() {
 
     # ── System prereqs ────────────────────────────────────────
     print_info "Requisitioning base materiel  //  stasis inventory check..."
-    necro_pkg "base-prereqs" \
+    necro_group_install "Base Prerequisites" "base-prereqs" "pacman" \
         base-devel \
         archlinux-keyring \
         findutils \
@@ -21,7 +21,7 @@ install_hyprland_base() {
 
     # ── Core Hyprland stack ───────────────────────────────────
     print_info "Deploying Hyprland cortex  //  primary tomb systems online..."
-    necro_pkg_critical "hyprland-core" \
+    necro_group_install "Hyprland Core" "hyprland-core" "pacman_critical" \
         hyprland \
         hypridle \
         hyprlock \
@@ -30,11 +30,12 @@ install_hyprland_base() {
         xdg-utils
 
     print_info "Binding polkit servitor  //  authority protocols engaged..."
-    necro_yay "hyprpolkitagent" hyprpolkitagent
+    necro_group_install "Polkit Agent" "hyprpolkitagent" "yay" \
+        hyprpolkitagent
 
     # ── Wayland plumbing ──────────────────────────────────────
     print_info "Routing Wayland conduits  //  signal architecture initialising..."
-    necro_pkg_critical "wayland-plumbing" \
+    necro_group_install "Wayland Plumbing" "wayland-plumbing" "pacman_critical" \
         pipewire \
         pipewire-audio \
         pipewire-pulse \
@@ -46,20 +47,27 @@ install_hyprland_base() {
         wl-clipboard \
         cliphist
 
+    # ── Kitty terminal ────────────────────────────────────────
+    print_info "Raising Canoptek terminal interface  //  kitty substrate binding..."
+    necro_group_install "Kitty Terminal" "kitty" "pacman" \
+        kitty
+
     # ── Audio / media ─────────────────────────────────────────
     print_info "Calibrating resonance arrays  //  audio substrate online..."
-    necro_pkg "audio-media" \
+    necro_group_install "Audio + Media" "audio-media" "pacman" \
         pamixer \
         pavucontrol \
         playerctl \
         mpv
 
     print_info "Binding mpris scarab  //  media control layer..."
-    necro_yay "mpris-wlogout" mpv-mpris wlogout
+    necro_group_install "MPRIS + Wlogout" "mpris-wlogout" "yay" \
+        mpv-mpris \
+        wlogout
 
     # ── System utilities ──────────────────────────────────────
     print_info "Deploying utility scarabs  //  tomb maintenance complement..."
-    necro_pkg "system-utils" \
+    necro_group_install "System Utilities" "system-utils" "pacman" \
         bc \
         imagemagick \
         inxi \
@@ -76,7 +84,7 @@ install_hyprland_base() {
 
     # ── Qt theming support ────────────────────────────────────
     print_info "Applying Qt dermal substrate  //  visual cortex preparation..."
-    necro_pkg "qt-theming" \
+    necro_group_install "Qt Theming" "qt-theming" "pacman" \
         qt5ct \
         qt6-svg \
         nwg-look \
@@ -84,7 +92,7 @@ install_hyprland_base() {
 
     # ── Optional extras ───────────────────────────────────────
     print_info "Acquiring ancillary tomb complement  //  non-essential but worthy..."
-    necro_pkg "optional-extras" \
+    necro_group_install "Optional Extras" "optional-extras" "pacman" \
         loupe \
         mousepad \
         nvtop \
@@ -92,7 +100,8 @@ install_hyprland_base() {
         yt-dlp
 
     print_info "Binding wallust chromatic array  //  colour extraction protocols..."
-    necro_yay "wallust" wallust
+    necro_group_install "Wallust" "wallust" "yay" \
+        wallust
 
     # ── Enable essential services ─────────────────────────────
     print_info "Awakening Pipewire servitors  //  audio daemons bound to the dynasty..."
