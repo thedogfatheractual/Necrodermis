@@ -178,9 +178,7 @@ fi
 
 echo -e "  ${DG}  Distribution:${NC} ${G}${B}${DISTRO}${NC}"
 echo ""
-
 install_yay
-            install_cachyos_repos
 necro_init_log
 
 mode=$(gum choose \

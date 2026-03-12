@@ -94,6 +94,13 @@ necro_tui_done() {
 # Redraws every 0.5s from the stages manifest.
 # ════════════════════════════════════════════════════════════
 _necro_tui_right_pane() {
+    printf "${CLS}"
+    echo ""
+    echo -e "${G}${B}  STAGE STATUS${NC}"
+    echo -e "${DG}  ─────────────────────────────${NC}"
+    echo ""
+    echo -e "${DG}  ·  awaiting installer...${NC}"
+
     while [[ ! -f "$NECRO_TUI_STAGES_FILE" ]]; do
         sleep 0.3
     done
