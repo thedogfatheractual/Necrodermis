@@ -355,8 +355,8 @@ necro_tui_launch() {
     tmux set-option -t "$NECRO_TUI_SESSION" status-interval 1
 
     # ── Pane borders ──
-    tmux set-option -t "$NECRO_TUI_SESSION" pane-border-style "fg=colour0"
-    tmux set-option -t "$NECRO_TUI_SESSION" pane-active-border-style "fg=colour2"
+    tmux set-option -t "$NECRO_TUI_SESSION" pane-border-style "fg=colour238"
+    tmux set-option -t "$NECRO_TUI_SESSION" pane-active-border-style "fg=colour240"
     tmux set-option -t "$NECRO_TUI_SESSION" pane-border-lines heavy
 
     # ── Build layout ──

@@ -37,7 +37,7 @@ install_hyprland_base() {
     echo ""
 
     local spas_choice
-    if [[ -z "${WAYLAND_DISPLAY:-}" && -z "${DISPLAY:-}" ]]; then
+    if true; then
         spas_choice="NO"
         print_info "TTY mode  //  skipping Spasskaya Clocks"
     else
