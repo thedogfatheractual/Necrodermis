@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════
 # NECRODERMIS — TRIAGE + NURSE + CRITICAL FAILURE SYSTEM
-# Append entire contents to the bottom of scripts/common.sh
+# Sourced by scripts/common.sh — do not run directly
 # ════════════════════════════════════════════════════════════
 
 # ── GLOBALS ──
@@ -10,10 +10,10 @@ NECRO_LOG_FILE="${NECRO_LOG_FILE:-$HOME/.local/share/necrodermis/install.log}"
 NECRO_FAIL_COUNT=0
 NECRO_SKIP_COUNT=0
 NECRO_OK_COUNT=0
-NECRO_TRIAGE_MAX_ATTEMPTS=3   # Max triage checks before circuit break
-NECRO_TRIAGE_TIMEOUT=30       # Seconds before a single triage attempt is abandoned
-NECRO_NURSE_TIMEOUT=10        # Seconds to wait at nurse prompt before limping on
-NECRO_CRITICAL_TIMEOUT=30     # Seconds to wait at critical prompt before exit
+NECRO_TRIAGE_MAX_ATTEMPTS=3
+NECRO_TRIAGE_TIMEOUT=30
+NECRO_NURSE_TIMEOUT=10
+NECRO_CRITICAL_TIMEOUT=30
 NECRO_STAGE_CURRENT=0
 NECRO_STAGE_TOTAL=0
 
@@ -21,8 +21,6 @@ NECRO_STAGE_TOTAL=0
 # ════════════════════════════════════════════════════════════
 # NECRO_LOG
 # ════════════════════════════════════════════════════════════
-# Usage: necro_log "LEVEL" "component" "message"
-# Levels: OK | SKIP | FAIL | FUBAR | INFO | RETRY | NURSE | CRIT
 necro_log() {
     local level="$1"
     local component="$2"
@@ -45,7 +43,6 @@ necro_log() {
 # ════════════════════════════════════════════════════════════
 # NECRO_INIT_LOG
 # ════════════════════════════════════════════════════════════
-# Call once at the top of install.sh to initialise the log file.
 necro_init_log() {
     mkdir -p "$(dirname "$NECRO_LOG_FILE")"
     {
@@ -63,13 +60,9 @@ necro_init_log() {
 # ════════════════════════════════════════════════════════════
 # NECRO_OPEN_LOG_TERMINAL
 # ════════════════════════════════════════════════════════════
-# Tries to open a terminal window showing the tail of the install log.
-# Falls back gracefully: kitty → foot → xterm → inline print.
-# In TTY (no DISPLAY/WAYLAND_DISPLAY) always falls back to inline.
 necro_open_log_terminal() {
     local log_cmd="echo ''; echo '  ══ NECRODERMIS DIAGNOSTIC LOG ══'; echo ''; tail -60 ${NECRO_LOG_FILE}; echo ''; echo '  ══ END OF LOG  (scroll up for full output) ══'; echo ''; read -p \"  Press ENTER to close...\" _"
 
-    # Only try to open a graphical terminal if we're in a graphical session
     if [[ -n "${WAYLAND_DISPLAY:-}" || -n "${DISPLAY:-}" ]]; then
         if command -v kitty &>/dev/null; then
             kitty --title "NECRODERMIS DIAGNOSTIC LOG" bash -c "$log_cmd" &
@@ -78,14 +71,12 @@ necro_open_log_terminal() {
             foot --title "NECRODERMIS DIAGNOSTIC LOG" bash -c "$log_cmd" &
             return 0
         elif command -v xterm &>/dev/null; then
-            xterm -title "NECRODERMIS DIAGNOSTIC LOG" \
-                -fg green -bg black \
+            xterm -title "NECRODERMIS DIAGNOSTIC LOG" -fg green -bg black \
                 -e bash -c "$log_cmd" &
             return 0
         fi
     fi
 
-    # TTY or no terminal emulator available — print inline
     echo ""
     echo -e "${R}${B}  ══ NECRODERMIS DIAGNOSTIC LOG (last 60 lines) ══${NC}"
     echo ""
@@ -102,14 +93,6 @@ necro_open_log_terminal() {
 # ════════════════════════════════════════════════════════════
 # NECRO_CRITICAL_FAILURE
 # ════════════════════════════════════════════════════════════
-# Called when a CRITICAL component fails all triage and nurse routes.
-# Opens a terminal with the log tail, presents two options:
-#   - Restart installer from top
-#   - Exit and diagnose
-# Auto-exits after NECRO_CRITICAL_TIMEOUT seconds if no input.
-#
-# Usage: necro_critical_failure "component" "failed_cmd" "what_we_tried"
-# Does not return — always exits or restarts.
 necro_critical_failure() {
     local component="$1"
     local failed_cmd="$2"
@@ -139,19 +122,16 @@ necro_critical_failure() {
     echo ""
     echo -e "  ${Y}  This component is required for Necrodermis to function.${NC}"
     echo -e "  ${Y}  The awakening sequence cannot proceed without it.${NC}"
-    echo -e "  ${Y}  The Canoptek units have no further repair protocols.${NC}"
     echo ""
     echo -e "  ${DG}  Opening diagnostic log...${NC}"
     echo ""
 
-    # Open the log — graphical terminal if available, inline if not
     necro_open_log_terminal
     sleep 1
 
     echo -e "  ${Y}  Auto-exiting in ${NECRO_CRITICAL_TIMEOUT}s if no directive is given.${NC}"
     echo ""
 
-    # ── CRITICAL CHOICE — restart or exit ──
     local crit_choice
     crit_choice=$(
         timeout "$NECRO_CRITICAL_TIMEOUT" \
@@ -167,17 +147,13 @@ necro_critical_failure() {
     ) || crit_choice="timeout"
 
     case "$crit_choice" in
-
         *"RESTART AWAKENING"*)
             echo ""
             echo -e "  ${G}  Rebooting awakening sequence...${NC}"
-            echo -e "  ${DG}  The tomb stirs again. May the next attempt hold.${NC}"
-            echo ""
             necro_log "CRIT" "$component" "Organic directive: restart installer"
             sleep 1
             exec bash "$SCRIPT_DIR/install.sh"
             ;;
-
         *"EXIT AND DIAGNOSE"* | "timeout" | *)
             echo ""
             echo -e "${G}${B}  ╔══════════════════════════════════════════════════════════════╗${NC}"
@@ -185,22 +161,12 @@ necro_critical_failure() {
             echo -e "${G}${B}  ╚══════════════════════════════════════════════════════════════╝${NC}"
             echo ""
             if [[ "$crit_choice" == "timeout" ]]; then
-                echo -e "  ${DG}  No directive received — exiting.${NC}"
                 necro_log "CRIT" "$component" "Critical timeout — auto-exit"
             else
                 necro_log "CRIT" "$component" "Organic directive: exit and diagnose"
             fi
-            echo ""
-            echo -e "  ${B}  ── CRITICAL COMPONENT ─────────────────────────────────────${NC}"
-            echo -e "  ${R}  ${component}${NC}  failed to install  //  ${pkg_name}"
-            echo ""
-            echo -e "  ${B}  ── DIAGNOSTIC LOG ──────────────────────────────────────────${NC}"
             echo -e "  ${G}    cat ${NECRO_LOG_FILE}${NC}"
-            echo ""
-            echo -e "  ${B}  ── RESTART WHEN READY ──────────────────────────────────────${NC}"
             echo -e "  ${G}    bash ~/Necrodermis/install.sh${NC}"
-            echo ""
-            echo -e "  ${B}  ── REPORT A BUG ────────────────────────────────────────────${NC}"
             echo -e "  ${G}    https://github.com/thedogfatheractual/Necrodermis/issues${NC}"
             echo ""
             echo -e "  ${DG}  The stars remember. The tomb will wait.${NC}"
@@ -214,13 +180,6 @@ necro_critical_failure() {
 # ════════════════════════════════════════════════════════════
 # NECRO_NURSE
 # ════════════════════════════════════════════════════════════
-# Last resort before limp mode (non-critical) or critical failure.
-# Presents failure to user, offers manual fix or full pause.
-# Auto-continues after NECRO_NURSE_TIMEOUT seconds if no input.
-# If is_critical=true, routes to necro_critical_failure on give-up.
-#
-# Usage: necro_nurse "component" "failed_cmd" "what_we_tried" [is_critical]
-# Returns: 0 = user fixed it, 1 = limping on (non-critical only)
 necro_nurse() {
     local component="$1"
     local failed_cmd="$2"
@@ -241,12 +200,9 @@ necro_nurse() {
     echo -e "  ${DG}  Package/target:${NC}     ${pkg_name}"
     echo -e "  ${DG}  Routes attempted:${NC}   ${what_we_tried}"
     echo ""
-    echo -e "  ${DG}  The Canoptek units have exhausted automated repair protocols.${NC}"
-    echo -e "  ${DG}  Organic intervention may be required.${NC}"
     echo -e "  ${Y}  Auto-continuing in ${NECRO_NURSE_TIMEOUT}s if no directive is given.${NC}"
     echo ""
 
-    # ── TIMED CHOICE ──
     local nurse_choice
     nurse_choice=$(
         timeout "$NECRO_NURSE_TIMEOUT" \
@@ -263,16 +219,7 @@ necro_nurse() {
     ) || nurse_choice="timeout"
 
     case "$nurse_choice" in
-
-        # ── OPTION 1: User knows the fix ──
         *"I KNOW THE FIX"*)
-            echo ""
-            echo -e "  ${G}  Enter the command or path to resolve this fault:${NC}"
-            echo -e "  ${DG}  Component:  ${component}${NC}"
-            echo -e "  ${DG}  Target:     ${pkg_name}${NC}"
-            echo -e "  ${DG}  Examples:${NC}"
-            echo -e "  ${DG}    sudo pacman -S ${pkg_name}${NC}"
-            echo -e "  ${DG}    ln -s /usr/bin/${pkg_name} ~/.local/bin/${pkg_name}${NC}"
             echo ""
             local user_cmd
             user_cmd=$(gum input \
@@ -284,78 +231,49 @@ necro_nurse() {
 
             if [[ -z "$user_cmd" ]]; then
                 necro_log "NURSE" "$component" "No organic directive entered — moving on"
-                print_info "No command entered  //  logging fault and continuing"
                 [[ "$is_critical" == "true" ]] && \
                     necro_critical_failure "$component" "$failed_cmd" "$what_we_tried"
                 return 1
             fi
 
-            echo ""
-            print_info "Executing organic directive  //  ${user_cmd}"
             necro_log "NURSE" "$component" "Organic directive: $user_cmd"
-
             if eval "$user_cmd"; then
-                necro_log "NURSE" "$component" "Organic intervention succeeded  //  $user_cmd"
+                necro_log "NURSE" "$component" "Organic intervention succeeded"
                 print_ok "${component}  ${DG}//  fault resolved — continuing${NC}"
                 return 0
             else
-                necro_log "NURSE" "$component" "Organic directive failed  //  $user_cmd"
-                print_err "${component}  //  command failed"
+                necro_log "NURSE" "$component" "Organic directive failed"
                 [[ "$is_critical" == "true" ]] && \
                     necro_critical_failure "$component" "$failed_cmd" "$what_we_tried"
                 return 1
             fi
             ;;
 
-        # ── OPTION 2: User wants to think — pause and hand them the controls ──
         *"LET ME THINK"*)
             echo ""
             echo -e "${G}${B}  ╔══════════════════════════════════════════════════════════════╗${NC}"
             echo -e "${G}${B}  ║   STASIS PAUSE  //  AWAKENING SEQUENCE SUSPENDED            ║${NC}"
             echo -e "${G}${B}  ╚══════════════════════════════════════════════════════════════╝${NC}"
             echo ""
-            echo -e "  ${DG}  The tomb is patient. Take what time you require.${NC}"
-            echo ""
-            echo -e "  ${B}  ── FAULT DETAILS ──────────────────────────────────────────${NC}"
-            echo -e "  ${R}  Component:${NC}       ${component}"
-            [[ "$is_critical" == "true" ]] && \
-                echo -e "  ${R}${B}  ⚠  CRITICAL  //  installer cannot continue without this${NC}"
-            echo -e "  ${R}  Failed command:${NC}  ${failed_cmd}"
-            echo -e "  ${R}  Package target:${NC}  ${pkg_name}"
-            echo -e "  ${R}  Routes tried:${NC}    ${what_we_tried}"
-            echo ""
-            echo -e "  ${B}  ── RESUME AWAKENING SEQUENCE ───────────────────────────────${NC}"
+            echo -e "  ${R}  Component:  ${component}${NC}"
             echo -e "  ${G}    bash ~/Necrodermis/install.sh --resume${NC}"
-            echo -e "  ${DG}  (completed components will be skipped)${NC}"
-            echo ""
-            echo -e "  ${B}  ── READ DIAGNOSTIC LOG ─────────────────────────────────────${NC}"
             echo -e "  ${G}    cat ${NECRO_LOG_FILE}${NC}"
             echo ""
-            echo -e "  ${DG}  The stars remember. The tomb awaits your return.${NC}"
-            echo ""
-            necro_log "NURSE" "$component" \
-                "Awakening sequence suspended by organic directive — awaiting manual resume"
+            necro_log "NURSE" "$component" "Awakening sequence suspended — awaiting manual resume"
             exit 0
             ;;
 
-        # ── OPTION 3 or TIMEOUT: Move on / give up ──
         *"ACCEPTABLE LOSS"* | "timeout" | *)
             echo ""
             if [[ "$nurse_choice" == "timeout" ]]; then
-                print_info "No directive received  //  ${component} flagged in log"
-                necro_log "NURSE" "$component" \
-                    "Nurse timeout (${NECRO_NURSE_TIMEOUT}s) — limp mode  //  ${pkg_name}"
+                necro_log "NURSE" "$component" "Nurse timeout — limp mode  //  ${pkg_name}"
             else
-                print_info "Acceptable loss confirmed  //  ${component} flagged in log"
-                necro_log "NURSE" "$component" \
-                    "Acceptable loss — limp mode  //  ${pkg_name}"
+                necro_log "NURSE" "$component" "Acceptable loss — limp mode  //  ${pkg_name}"
             fi
 
-            # Critical components don't get limp mode — they escalate
             if [[ "$is_critical" == "true" ]]; then
                 necro_critical_failure "$component" "$failed_cmd" "$what_we_tried"
             fi
-
             return 1
             ;;
     esac
@@ -365,13 +283,6 @@ necro_nurse() {
 # ════════════════════════════════════════════════════════════
 # NECRO_TRIAGE
 # ════════════════════════════════════════════════════════════
-# Called by necro_pkg / necro_yay on failure.
-# Runs a capped logic chain — max attempts + timeout circuit breaker.
-# On exhaustion: passes to necro_nurse.
-# If critical=true, nurse eventually calls necro_critical_failure.
-#
-# Usage: necro_triage "component" "failed_cmd" "pacman|yay|generic" ["critical"]
-# Returns: 0 = recovered, 1 = limp on (non-critical only)
 necro_triage() {
     local component="$1"
     local failed_cmd="$2"
@@ -385,110 +296,73 @@ necro_triage() {
     necro_log "INFO" "$component" "Triage initiated  //  failed: $failed_cmd"
     print_info "Triage engaged  //  ${component}"
 
-    # ── CIRCUIT BREAKER ──
-    # Call before each triage check.
-    # Returns 1 if attempt cap or elapsed time exceeded — triggers nurse.
     _triage_check() {
         (( attempts++ ))
         local elapsed=$(( $(date +%s) - start_time ))
-
         if (( attempts > NECRO_TRIAGE_MAX_ATTEMPTS )); then
-            necro_log "FUBAR" "$component" \
-                "Circuit break — max attempts (${NECRO_TRIAGE_MAX_ATTEMPTS}) reached"
+            necro_log "FUBAR" "$component" "Circuit break — max attempts reached"
             return 1
         fi
-
         if (( elapsed > NECRO_TRIAGE_TIMEOUT )); then
-            necro_log "FUBAR" "$component" \
-                "Circuit break — timeout (${elapsed}s > ${NECRO_TRIAGE_TIMEOUT}s)"
+            necro_log "FUBAR" "$component" "Circuit break — timeout"
             return 1
         fi
-
         return 0
     }
 
-    # ── CHECK 1: yay missing from PATH — can we restore it? ──
-    _triage_check || {
-        necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"
-        return $?
-    }
+    # ── CHECK 1: yay not in PATH ──
+    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     if [[ "$failure_type" == "yay" ]] && ! command -v yay &>/dev/null; then
         what_we_tried+="[yay re-init] "
-        print_info "yay not in PATH  //  attempting re-initialisation..."
-        if source "${SCRIPT_DIR}/scripts/functions/yay.sh" 2>/dev/null \
-            && install_yay 2>/dev/null; then
+        if source "${SCRIPT_DIR}/scripts/functions/yay.sh" 2>/dev/null && install_yay 2>/dev/null; then
             YAY_AVAILABLE=true
-            print_info "yay restored  //  retrying ${component}..."
             if timeout "$NECRO_TRIAGE_TIMEOUT" bash -c "$failed_cmd" 2>/dev/null; then
                 necro_log "OK" "$component" "Recovered after yay re-init"
                 return 0
             fi
         fi
-        necro_log "INFO" "$component" "yay re-init failed"
     fi
 
-    # ── CHECK 2: Does pacman have it instead? ──
-    _triage_check || {
-        necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"
-        return $?
-    }
+    # ── CHECK 2: pacman fallback ──
+    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     if [[ "$failure_type" == "yay" ]]; then
         what_we_tried+="[pacman fallback] "
         local pkg_name
         pkg_name=$(echo "$failed_cmd" | awk '{print $NF}')
         if [[ -n "$pkg_name" ]] && pacman -Si "$pkg_name" &>/dev/null; then
-            print_info "AUR → pacman fallback  //  ${pkg_name}"
-            if timeout "$NECRO_TRIAGE_TIMEOUT" \
-                sudo pacman -S --needed --noconfirm "$pkg_name" 2>/dev/null; then
+            if timeout "$NECRO_TRIAGE_TIMEOUT" sudo pacman -S --needed --noconfirm "$pkg_name" 2>/dev/null; then
                 necro_log "OK" "$component" "pacman fallback succeeded  //  $pkg_name"
                 return 0
             fi
-        else
-            necro_log "INFO" "$component" "No pacman fallback for ${pkg_name:-unknown}"
         fi
     fi
 
-    # ── CHECK 3: Binary exists but not in PATH? ──
-    _triage_check || {
-        necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"
-        return $?
-    }
+    # ── CHECK 3: binary in PATH ──
+    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     what_we_tried+="[path hunt] "
     local bin_name
     bin_name=$(echo "$failed_cmd" | awk '{print $1}')
     if ! command -v "$bin_name" &>/dev/null; then
         local bin_path
-        bin_path=$(find /usr/bin /usr/local/bin "$HOME/.local/bin" \
-            -name "$bin_name" 2>/dev/null | head -1)
+        bin_path=$(find /usr/bin /usr/local/bin "$HOME/.local/bin" -name "$bin_name" 2>/dev/null | head -1)
         if [[ -n "$bin_path" ]]; then
-            print_info "Binary found at ${bin_path}  //  updating PATH"
             export PATH="$PATH:$(dirname "$bin_path")"
             if timeout "$NECRO_TRIAGE_TIMEOUT" bash -c "$failed_cmd" 2>/dev/null; then
                 necro_log "OK" "$component" "Recovered after PATH fix  //  $bin_path"
                 return 0
             fi
-        else
-            necro_log "INFO" "$component" "Binary '$bin_name' not found on system"
         fi
     fi
 
-    # ── ALL AUTOMATED ROUTES EXHAUSTED — PASS TO NURSE ──
-    necro_log "FUBAR" "$component" \
-        "All triage routes exhausted  //  tried: $what_we_tried"
+    necro_log "FUBAR" "$component" "All triage routes exhausted  //  tried: $what_we_tried"
     necro_nurse "$component" "$failed_cmd" "$what_we_tried" "$is_critical"
     return $?
 }
 
 
 # ════════════════════════════════════════════════════════════
-# NECRO_PKG  /  NECRO_PKG_CRITICAL
+# NECRO_PKG / NECRO_PKG_CRITICAL
 # ════════════════════════════════════════════════════════════
-# Drop-in for: sudo pacman -S --needed --noconfirm <pkg> [pkg...]
-# necro_pkg          — failure is limp-mode-able
-# necro_pkg_critical — failure halts the installer
-#
-# Usage: necro_pkg "component_label" pkg1 pkg2 pkg3
-#        necro_pkg_critical "component_label" pkg1 pkg2 pkg3
 necro_pkg() {
     local component="$1"; shift
     local pkgs=("$@")
@@ -499,8 +373,7 @@ necro_pkg() {
     else
         necro_log "FAIL" "$component" "pacman failed: ${pkgs[*]}"
         print_err "${component}  //  pacman failed — engaging triage"
-        necro_triage "$component" \
-            "sudo pacman -S --needed --noconfirm ${pkgs[*]}" "pacman" "false" || true
+        necro_triage "$component" "sudo pacman -S --needed --noconfirm ${pkgs[*]}" "pacman" "false" || true
     fi
 }
 
@@ -514,21 +387,14 @@ necro_pkg_critical() {
     else
         necro_log "FAIL" "$component" "pacman failed (CRITICAL): ${pkgs[*]}"
         print_err "${component}  //  pacman failed — engaging triage  ${R}[CRITICAL]${NC}"
-        necro_triage "$component" \
-            "sudo pacman -S --needed --noconfirm ${pkgs[*]}" "pacman" "critical"
+        necro_triage "$component" "sudo pacman -S --needed --noconfirm ${pkgs[*]}" "pacman" "critical"
     fi
 }
 
 
 # ════════════════════════════════════════════════════════════
-# NECRO_YAY  /  NECRO_YAY_CRITICAL
+# NECRO_YAY / NECRO_YAY_CRITICAL
 # ════════════════════════════════════════════════════════════
-# Drop-in for: yay -S --needed --noconfirm <pkg> [pkg...]
-# necro_yay          — failure is limp-mode-able
-# necro_yay_critical — failure halts the installer
-#
-# Usage: necro_yay "component_label" pkg1 pkg2
-#        necro_yay_critical "component_label" pkg1 pkg2
 necro_yay() {
     local component="$1"; shift
     local pkgs=("$@")
@@ -545,8 +411,7 @@ necro_yay() {
     else
         necro_log "FAIL" "$component" "yay failed: ${pkgs[*]}"
         print_err "${component}  //  yay failed — engaging triage"
-        necro_triage "$component" \
-            "yay -S --needed --noconfirm ${pkgs[*]}" "yay" "false" || true
+        necro_triage "$component" "yay -S --needed --noconfirm ${pkgs[*]}" "yay" "false" || true
     fi
 }
 
@@ -560,8 +425,7 @@ necro_yay_critical() {
     else
         necro_log "FAIL" "$component" "yay failed (CRITICAL): ${pkgs[*]}"
         print_err "${component}  //  yay failed — engaging triage  ${R}[CRITICAL]${NC}"
-        necro_triage "$component" \
-            "yay -S --needed --noconfirm ${pkgs[*]}" "yay" "critical"
+        necro_triage "$component" "yay -S --needed --noconfirm ${pkgs[*]}" "yay" "critical"
     fi
 }
 
@@ -569,7 +433,6 @@ necro_yay_critical() {
 # ════════════════════════════════════════════════════════════
 # NECRO_PRINT_SUMMARY
 # ════════════════════════════════════════════════════════════
-# Call at the very end of install.sh — inline fault report + log pointer.
 necro_print_summary() {
     echo ""
     print_section "INSTALLATION REPORT  //  TOMB WORLD DIAGNOSTIC SUMMARY"
@@ -578,107 +441,72 @@ necro_print_summary() {
     echo -e "  ${Y}  ·  Skipped:${NC}    ${NECRO_SKIP_COUNT}"
     echo -e "  ${R}  ✗  Failed:${NC}     ${NECRO_FAIL_COUNT}"
     echo ""
-
     if (( NECRO_FAIL_COUNT > 0 )); then
-        echo -e "  ${Y}  Some components could not be installed.${NC}"
-        echo -e "  ${Y}  The tomb world is operational — with known fault states.${NC}"
-        echo ""
-        echo -e "  ${R}  ── FAILED COMPONENTS ──────────────────────────────────────${NC}"
         grep -E "\[(FAIL |FUBAR|NURSE|CRIT )\]" "$NECRO_LOG_FILE" 2>/dev/null \
-            | while IFS= read -r line; do
-                echo -e "  ${DG}  $line${NC}"
-            done
+            | while IFS= read -r line; do echo -e "  ${DG}  $line${NC}"; done
         echo ""
-        echo -e "  ${B}  ── FULL DIAGNOSTIC LOG ─────────────────────────────────────${NC}"
         echo -e "  ${G}    cat ${NECRO_LOG_FILE}${NC}"
-        echo ""
-        echo -e "  ${B}  ── RESUME AFTER MANUAL FIXES ───────────────────────────────${NC}"
         echo -e "  ${G}    bash ~/Necrodermis/install.sh --resume${NC}"
-        echo ""
-        echo -e "  ${B}  ── REPORT A BUG ────────────────────────────────────────────${NC}"
         echo -e "  ${G}    https://github.com/thedogfatheractual/Necrodermis/issues${NC}"
-        echo ""
     else
         echo -e "  ${G}  All components installed without incident.${NC}"
-        echo -e "  ${DG}  The tomb world is fully operational.${NC}"
-        echo ""
     fi
+    echo ""
 }
+
 
 # ════════════════════════════════════════════════════════════
 # NECRO_GROUP_INSTALL
 # ════════════════════════════════════════════════════════════
-# Presents a package group to the operator with three paths:
-#
-#   YES (default / timeout) → install all, no further prompts
-#   NO                      → offer checklist of individual packages
-#     select some           → install selected subset
-#     select none           → critical? → necro_critical_failure
-#                             normal?   → skip + log
-#
-# pkg_manager values:
-#   pacman           — sudo pacman, non-critical
-#   pacman_critical  — sudo pacman, critical failure on full skip
-#   yay              — yay/AUR, non-critical
-#   yay_critical     — yay/AUR, critical failure on full skip
-#
-# Usage:
-#   necro_group_install "Display Label" "component-id" "pacman" \
-#       pkg1 pkg2 pkg3
-#
-#   necro_group_install "Hyprland Core" "hyprland-core" "pacman_critical" \
-#       hyprland hypridle hyprlock
-# ════════════════════════════════════════════════════════════
 necro_group_install() {
     local group_label="$1"
     local component_id="$2"
-    local pkg_manager="$3"   # pacman | pacman_critical | yay | yay_critical
+    local pkg_manager="$3"
     shift 3
     local pkgs=("$@")
 
-    # ── Derive criticality from pkg_manager string ──
     local is_critical="false"
     [[ "$pkg_manager" == *"_critical" ]] && is_critical="true"
 
-    # ── Display group header ──
+    necro_tui_stage_set "$component_id" "ACTIVE" 2>/dev/null || true
+
     (( NECRO_STAGE_CURRENT++ )) || true
     local stage_tag=""
-    if (( NECRO_STAGE_TOTAL > 0 )); then
-        stage_tag="  //  STAGE ${NECRO_STAGE_CURRENT}/${NECRO_STAGE_TOTAL}"
-    fi
+    (( NECRO_STAGE_TOTAL > 0 )) && stage_tag="  //  STAGE ${NECRO_STAGE_CURRENT}/${NECRO_STAGE_TOTAL}"
+
     echo ""
     echo -e "  ${G}${B}  ┌─ ${group_label}${stage_tag} ─────────────────────────────────${NC}"
-    for pkg in "${pkgs[@]}"; do
-        echo -e "  ${DG}  │  · ${pkg}${NC}"
-    done
+    for pkg in "${pkgs[@]}"; do echo -e "  ${DG}  │  · ${pkg}${NC}"; done
     echo -e "  ${G}${B}  └──────────────────────────────────────────────${NC}"
     echo ""
 
-    # ── PROMPT — default YES, auto-confirms after NECRO_NURSE_TIMEOUT ──
     local group_answer
-    group_answer=$(
-        timeout "${NECRO_NURSE_TIMEOUT:-10}" \
-        gum choose \
-            --header="  Install group: ${group_label}?" \
-            --header.foreground="2" \
-            --cursor.foreground="2" \
-            --selected.foreground="2" \
-            --item.foreground="7" \
-            "  YES — INSTALL ALL  " \
-            "  NO  — LET ME CHOOSE  " \
-        2>/dev/null
-    ) || group_answer="timeout"
+    if [[ -z "${WAYLAND_DISPLAY:-}" && -z "${DISPLAY:-}" ]]; then
+        group_answer="timeout"
+        print_info "TTY mode  //  auto-confirming: ${group_label}"
+    else
+        group_answer=$(
+            timeout "${NECRO_NURSE_TIMEOUT:-10}" \
+            gum choose \
+                --header="  Install group: ${group_label}?" \
+                --header.foreground="2" \
+                --cursor.foreground="2" \
+                --selected.foreground="2" \
+                --item.foreground="7" \
+                "  YES — INSTALL ALL  " \
+                "  NO  — LET ME CHOOSE  " \
+            2>/dev/null
+        ) || group_answer="timeout"
+    fi
 
-    # ── YES or timeout → install all packages ──
     if [[ "$group_answer" == "timeout" || "$group_answer" == *"YES"* ]]; then
         necro_log "INFO" "$component_id" "Group install: ${group_label}  //  all packages"
         _necro_group_do_install "$component_id" "$pkg_manager" "${pkgs[@]}"
         return $?
     fi
 
-    # ── NO → checklist of individual packages ──
     echo ""
-    print_info "Select packages from ${group_label}  ${DG}//  SPACE=toggle  ENTER=confirm${NC}"
+    print_info "Select packages  ${DG}//  SPACE=toggle  ENTER=confirm${NC}"
     echo ""
 
     local selected
@@ -686,7 +514,7 @@ necro_group_install() {
         printf '%s\n' "${pkgs[@]}" | \
         gum choose --no-limit \
             --selected="$(printf '%s,' "${pkgs[@]}")" \
-            --header="  ${group_label}  —  deselect packages you don't want" \
+            --header="  ${group_label}  —  deselect what you don't want" \
             --header.foreground="2" \
             --cursor.foreground="2" \
             --selected.foreground="2" \
@@ -694,60 +522,153 @@ necro_group_install() {
         2>/dev/null
     )
 
-    # ── Nothing selected → skip or critical ──
     if [[ -z "$selected" ]]; then
         if [[ "$is_critical" == "true" ]]; then
-            necro_log "CRIT" "$component_id" \
-                "Critical group skipped by operator: ${group_label}"
-            necro_critical_failure \
-                "$component_id" \
-                "group install: ${group_label}" \
-                "operator declined group and selected no individual packages"
+            necro_log "CRIT" "$component_id" "Critical group skipped: ${group_label}"
+            necro_tui_stage_set "$component_id" "FAIL" 2>/dev/null || true
+            necro_critical_failure "$component_id" "group install: ${group_label}" \
+                "operator declined all packages"
         else
-            necro_log "SKIP" "$component_id" \
-                "Group skipped by operator: ${group_label}  //  ${pkgs[*]}"
-            print_skip "${group_label}  //  group skipped by operator"
+            necro_log "SKIP" "$component_id" "Group skipped: ${group_label}  //  ${pkgs[*]}"
+            necro_tui_stage_set "$component_id" "SKIP" 2>/dev/null || true
+            print_skip "${group_label}  //  skipped by operator"
         fi
         return 0
     fi
 
-    # ── Install selected subset ──
     local selected_pkgs=()
     while IFS= read -r pkg; do
         [[ -n "$pkg" ]] && selected_pkgs+=("$(echo "$pkg" | xargs)")
     done <<< "$selected"
 
-    necro_log "INFO" "$component_id" \
-        "Group partial install: ${group_label}  //  ${selected_pkgs[*]}"
+    necro_log "INFO" "$component_id" "Group partial: ${group_label}  //  ${selected_pkgs[*]}"
     _necro_group_do_install "$component_id" "$pkg_manager" "${selected_pkgs[@]}"
     return $?
 }
 
-
-# ── Internal dispatcher — routes to correct necro_pkg/yay wrapper ──
 _necro_group_do_install() {
     local component_id="$1"
     local pkg_manager="$2"
     shift 2
     local pkgs=("$@")
+    local result=0
 
     case "$pkg_manager" in
-        pacman_critical)
-            necro_pkg_critical "$component_id" "${pkgs[@]}"
-            ;;
-        pacman)
-            necro_pkg "$component_id" "${pkgs[@]}"
-            ;;
-        yay_critical)
-            necro_yay_critical "$component_id" "${pkgs[@]}"
-            ;;
-        yay)
-            necro_yay "$component_id" "${pkgs[@]}"
-            ;;
+        pacman_critical) necro_pkg_critical "$component_id" "${pkgs[@]}" || result=$? ;;
+        pacman)          necro_pkg          "$component_id" "${pkgs[@]}" || result=$? ;;
+        yay_critical)    necro_yay_critical "$component_id" "${pkgs[@]}" || result=$? ;;
+        yay)             necro_yay          "$component_id" "${pkgs[@]}" || result=$? ;;
         *)
             print_err "necro_group_install: unknown pkg_manager '${pkg_manager}'"
             necro_log "FAIL" "$component_id" "Unknown pkg_manager: ${pkg_manager}"
+            necro_tui_stage_set "$component_id" "FAIL" 2>/dev/null || true
             return 1
             ;;
     esac
+
+    if (( result == 0 )); then
+        necro_tui_stage_set "$component_id" "OK" 2>/dev/null || true
+    else
+        necro_tui_stage_set "$component_id" "FAIL" 2>/dev/null || true
+    fi
+    return $result
+}
+
+
+# ════════════════════════════════════════════════════════════
+# NECRO_POST_INSTALL_REPORT
+# ════════════════════════════════════════════════════════════
+necro_post_install_report() {
+    local log="$NECRO_LOG_FILE"
+
+    local skipped_lines=()
+    while IFS= read -r line; do
+        skipped_lines+=("$line")
+    done < <(grep -E "\[(SKIP |FAIL |FUBAR|NURSE|CRIT )\]" "$log" 2>/dev/null)
+
+    local report=""
+    local skip_count="${#skipped_lines[@]}"
+
+    if (( skip_count == 0 )); then
+        report="  All stages completed without incident.\n\n  The tomb world is fully operational.\n  No skipped components. No outstanding faults."
+    else
+        report="  ${skip_count} stage(s) skipped or failed.\n\n"
+        report+="  ── SKIPPED / FAILED STAGES ─────────────────────────────────\n\n"
+        for line in "${skipped_lines[@]}"; do
+            local level component reason
+            level=$(echo "$line"     | grep -oP '(?<=\[)\w+(?=\s*\])' | head -1)
+            component=$(echo "$line" | awk '{print $3}')
+            reason=$(echo "$line"    | cut -d' ' -f4-)
+            report+="  [${level}]  ${component}\n        ${reason}\n\n"
+        done
+        report+="  ── RECOMMENDED ACTION ──────────────────────────────────────\n\n"
+        report+="  · Log out or reboot, then re-run the installer.\n\n"
+        report+="  · Arch Wiki: https://wiki.archlinux.org\n\n"
+        report+="  · Full log: ${log}"
+    fi
+
+    while true; do
+        clear
+        echo ""
+        echo -e "${G}${B}  ╔══════════════════════════════════════════════════════════════╗"
+        echo -e "  ║   NECRODERMIS — POST-INSTALLATION REPORT                     ║"
+        echo -e "  ║   AWAKENING SEQUENCE COMPLETE  //  TOMB WORLD DIAGNOSTIC      ║"
+        echo -e "  ╚══════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        echo -e "  ${G}  ✓  Successful:${NC}  ${NECRO_OK_COUNT}"
+        echo -e "  ${Y}  ·  Skipped:${NC}    ${NECRO_SKIP_COUNT}"
+        echo -e "  ${R}  ✗  Failed:${NC}     ${NECRO_FAIL_COUNT}"
+        echo ""
+        echo -e "${DG}  ────────────────────────────────────────────────────────────${NC}"
+        echo ""
+        echo -e "$report" | while IFS= read -r rline; do echo -e "  ${DG}${rline}${NC}"; done
+        echo ""
+        echo -e "${DG}  ────────────────────────────────────────────────────────────${NC}"
+        echo ""
+
+        local choice
+        if [[ -n "${WAYLAND_DISPLAY:-}" || -n "${DISPLAY:-}" ]]; then
+            choice=$(gum choose \
+                --header="  NEXT DIRECTIVE  //  the tomb awaits your command" \
+                --header.foreground="2" \
+                --cursor.foreground="2" \
+                --selected.foreground="2" \
+                --item.foreground="7" \
+                "  REBOOT NOW         //  recommended — apply all changes cleanly" \
+                "  LOG OUT            //  return to login screen" \
+                "  OPEN ARCH WIKI     //  https://wiki.archlinux.org" \
+                "  CLOSE              //  dismiss and continue" \
+            2>/dev/null) || choice="CLOSE"
+        else
+            echo -e "  ${G}  [R]${NC} Reboot   ${G}[L]${NC} Log out   ${G}[W]${NC} Arch Wiki   ${G}[C]${NC} Close"
+            echo ""
+            read -rp "  → " tty_choice
+            case "${tty_choice,,}" in
+                r) choice="REBOOT" ;; l) choice="LOGOUT" ;;
+                w) choice="WIKI"   ;; *) choice="CLOSE"  ;;
+            esac
+        fi
+
+        case "$choice" in
+            *"REBOOT"*)
+                print_info "Rebooting..."
+                sleep 2; sudo reboot ;;
+            *"LOG OUT"* | *"LOGOUT"*)
+                print_info "Logging out..."
+                sleep 2
+                command -v loginctl &>/dev/null && loginctl terminate-user "$USER" \
+                    || pkill -KILL -u "$USER" ;;
+            *"ARCH WIKI"* | *"WIKI"*)
+                command -v xdg-open &>/dev/null \
+                    && xdg-open "https://wiki.archlinux.org" &>/dev/null & \
+                    || echo -e "  ${G}  https://wiki.archlinux.org${NC}"
+                read -rp "  Press ENTER to return..." _
+                continue ;;
+            *)
+                print_info "Report dismissed  //  the tomb stands ready"
+                echo ""
+                break ;;
+        esac
+        break
+    done
 }

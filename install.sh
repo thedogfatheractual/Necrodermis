@@ -8,9 +8,6 @@
 # LAST DIAGNOSTIC: 4,891 YEARS AGO  //  TOMB INTEGRITY BREACH DETECTED
 # ════════════════════════════════════════════════════════════
 
-
-# set -e  # removed — triage handles failures
-
 # ── DEBUG MODE ──
 NECRO_DEBUG=0
 for arg in "$@"; do
@@ -18,7 +15,6 @@ for arg in "$@"; do
 done
 
 # ── GUM BOOTSTRAP ──
-# Runs before debug shims — uses command builtin to bypass any sudo override
 if ! command -v gum &>/dev/null; then
     echo "  Acquiring gum (required for installer interface)..."
     if command -v pacman &>/dev/null; then
@@ -48,6 +44,34 @@ CONFIG_DIR="$HOME/.config"
 NECRO_HOME="$HOME/.local/share/necrodermis"
 NECRO_BIN="$HOME/.local/bin"
 
+# ── TUI — source early, dispatch internal flags before anything else loads ──
+NECRO_TUI_MODE="standalone"
+for arg in "$@"; do
+    [[ "$arg" == "--tui-inside" ]] && NECRO_TUI_MODE="inside"
+done
+
+if [[ -f "$SCRIPT_DIR/scripts/necro-tui.sh" ]]; then
+    source "$SCRIPT_DIR/scripts/necro-tui.sh"
+fi
+
+case "${1:-}" in
+    --tui-left-pane)     _necro_tui_left_pane;    exit 0 ;;
+    --tui-right-pane)    _necro_tui_right_pane;   exit 0 ;;
+    --tui-resource-bar)  _necro_tui_resource_bar; exit 0 ;;
+esac
+
+# ── TUI — auto-launch tmux if not already inside ──
+if [[ "$NECRO_TUI_MODE" == "standalone" ]]; then
+    if command -v tmux &>/dev/null; then
+        necro_tui_launch "${BASH_SOURCE[0]}" "$@"
+        exit 0
+    else
+        echo ""
+        echo -e "  \033[0;33m  tmux not found — running without TUI.\033[0m"
+        echo -e "  \033[2;32m  Install tmux for the full Canoptek interface.\033[0m"
+        echo ""
+    fi
+fi
 
 # ── SOURCE ALL MODULES ──
 source "$SCRIPT_DIR/scripts/common.sh"
@@ -85,7 +109,6 @@ run_selective() {
         preserve_answer="n"
     fi
 
-    # Build ordered display list and function map from COMPONENTS
     local display_list=()
     declare -A fn_map
     for entry in "${COMPONENTS[@]}"; do
@@ -164,13 +187,19 @@ mode=$(gum choose \
 print_credit
 
 case "$mode" in
-        "Full install"*)
+    "Full install"*)
         print_section "FULL INSTALLATION MODE  //  COMPLETE AWAKENING SEQUENCE"
         echo ""
         echo -e "${Y}  This will install all packages and deploy Necrodermis configs.${NC}"
         echo -e "${Y}  Estimated time: 10–30 minutes depending on connection.${NC}"
         echo ""
+        echo -e "${B}  ── ATTENTION ────────────────────────────────────────────────${NC}"
+        echo -e "${Y}  You will be prompted for your sudo password several times.${NC}"
+        echo -e "${Y}  Do not leave the terminal unattended during installation.${NC}"
+        echo -e "${B}  ─────────────────────────────────────────────────────────────${NC}"
+        echo ""
         if confirm "Initiate full awakening sequence?"; then
+            necro_init_log
             install_yay
             configure_timezone
             check_deps
@@ -182,6 +211,7 @@ case "$mode" in
         ;;
     *)
         print_section "THEME INSTALLATION MODE  //  DERMAL LAYER ONLY"
+        necro_init_log
         configure_timezone
         check_deps
         run_selective
@@ -189,6 +219,9 @@ case "$mode" in
 esac
 
 bundle_uninstaller
+
+necro_tui_done
+necro_post_install_report
 
 echo ""
 echo -e "${G}${B}"
@@ -208,4 +241,3 @@ echo -e "  ${DG}  The silent king stirs. The stars remember.${NC}"
 echo ""
 echo -e "${G}${B}  ORGANIC MATTER IS TEMPORARY  //  NECRODERMIS IS ETERNAL${NC}"
 echo ""
-
