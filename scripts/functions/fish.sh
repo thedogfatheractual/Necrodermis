@@ -38,6 +38,7 @@ install_fish() {
 
     necro_run mkdir -p "$DEST"
     necro_run cp -r "$SRC/." "$DEST/"
+    sed -i '/cachyos/d' "$DEST/config.fish"
 
     necro_print "fish" "Deployed — user-owned, not symlinked."
 }
