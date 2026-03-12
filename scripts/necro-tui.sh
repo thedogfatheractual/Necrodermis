@@ -374,7 +374,7 @@ necro_tui_launch() {
 
     # Centre — actual installer (focus here)
     tmux send-keys -t "$NECRO_TUI_SESSION:0.1" \
-        "bash '${install_script}' --tui-inside ${install_args[*]}" Enter
+        "bash '${install_script}' --tui-inside ${install_args[*]}; tmux kill-session -t '${NECRO_TUI_SESSION}'" Enter
 
     tmux select-pane -t "$NECRO_TUI_SESSION:0.1"
 
