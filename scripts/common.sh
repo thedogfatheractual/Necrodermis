@@ -236,3 +236,4 @@ necro_backup() {
         print_info "archived  //  $BACKUP_DIR/$name"
     fi
 }
+source "$SCRIPT_DIR/scripts/common_triage.sh"
