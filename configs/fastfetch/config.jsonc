@@ -43,6 +43,11 @@
             "key": "\u001b[33m⬡  TOMBWORLD\u001b[0m"
         },
         {
+            "type": "command",
+            "key": "\u001b[33m│ ├  NECRODERMIS BUILD\u001b[0m",
+            "text": "cat ~/.local/share/necrodermis/VERSION 2>/dev/null | tr -d '[:space:]' | sed 's/^/v/' || echo 'unknown'"
+        },
+        {
             "type": "kernel",
             "key": "\u001b[33m│ ├  PROTOCOL VERSION\u001b[0m"
         },

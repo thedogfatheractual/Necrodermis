@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════
 # NECRODERMIS — SAUTEKH DYNASTY
-# Uninstall Script — Arch / CachyOS / Manjaro / EndeavourOS
+# Uninstall Script — Arch / Manjaro / EndeavourOS
 # https://github.com/thedogfatheractual/Necrodermis
 #
 # ════════════════════════════════════════════════════════════
@@ -21,7 +21,10 @@
 #
 # ════════════════════════════════════════════════════════════
 
-set -e
+# ── VERSION ──
+# Reads from VERSION file bundled alongside this script.
+NECRO_HOME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NECRO_VERSION="$(cat "${NECRO_HOME_DIR}/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 
 # ── COLOURS ──
 G='\033[0;32m'
@@ -55,7 +58,7 @@ print_header() {
     echo "  ║          ╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝            ║"
     echo "  ║                                                                  ║"
     echo "  ║              DEACTIVATION PROTOCOL  //  TOMBWORLD VI             ║"
-    echo "  ║                    RETURNING TO STASIS                          ║"
+    echo "  ║           RETURNING TO STASIS  //  v${NECRO_VERSION}                       ║"
     echo "  ║                                                                  ║"
     echo "  ╚══════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -453,7 +456,7 @@ echo -e "${G}${B}"
 echo "  ╔══════════════════════════════════════════════════════════════════╗"
 echo "  ║                                                                  ║"
 echo "  ║           NECRODERMIS DEACTIVATION COMPLETE                      ║"
-echo "  ║           THE DYNASTY RETURNS TO STASIS                          ║"
+echo "  ║           THE DYNASTY RETURNS TO STASIS  //  v${NECRO_VERSION}              ║"
 echo "  ║           WE SHALL RISE AGAIN WHEN THE STARS ARE RIGHT           ║"
 echo "  ║                                                                  ║"
 echo "  ╚══════════════════════════════════════════════════════════════════╝"
