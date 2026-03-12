@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# ============================================================
+#  necro-install-hooks — wires .githooks into git config
+#  Run once after cloning on any machine (host or VM)
+#  Usage: bash necro-install-hooks
+# ============================================================
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [[ -z "$REPO_ROOT" ]]; then
+  echo "[necro-hooks] ERROR: not inside a git repo"
+  exit 1
+fi
+
+HOOKS_DIR="$REPO_ROOT/.githooks"
+BUMP_SCRIPT="$REPO_ROOT/necro-bump"
+
+# Point git at our hooks dir
+git config core.hooksPath "$HOOKS_DIR"
+
+# Make hooks executable
+chmod +x "$HOOKS_DIR/pre-push"
+chmod +x "$BUMP_SCRIPT"
+
+# Optionally symlink necro-bump to PATH
+if [[ -d "$HOME/.local/bin" ]]; then
+  ln -sf "$BUMP_SCRIPT" "$HOME/.local/bin/necro-bump"
+  echo "[necro-hooks] necro-bump linked to ~/.local/bin/necro-bump"
+fi
+
+echo "[necro-hooks] Hooks installed. Current version: $(cat "$REPO_ROOT/VERSION")"
+echo ""
+echo "  Every git push  → patch auto-bumps (1.3.x → 1.3.x+1)"
+echo "  necro-bump minor → 1.3.x → 1.4.0   (run before push)"
+echo "  necro-bump major → 1.x.x → 2.0.0   (run before push)"
