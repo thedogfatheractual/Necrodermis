@@ -127,6 +127,11 @@ install_hyprland_base() {
     print_info "Establishing XDG territorial markers  //  directory hierarchy confirmed..."
     xdg-user-dirs-update \
         || necro_log "FAIL" "xdg-user-dirs" "xdg-user-dirs-update failed"
+    print_info "Binding SDDM display manager  //  enabling on next boot..."
+    sudo systemctl enable sddm \
+        || necro_log "FAIL" "sddm" "systemctl enable sddm failed"
+    necro_log "OK" "sddm" "SDDM enabled"
+    print_ok "SDDM  ${DG}//  display manager enabled${NC}"
 
     print_ok "Hyprland substrate online  ${DG}//  the tomb world stirs${NC}"
 }
