@@ -159,41 +159,46 @@ _necro_tui_right_pane() {
 
 
 # ════════════════════════════════════════════════════════════
-# _NECRO_TUI_LEFT_PANE — install log tail (left panel)
-# Follows NECRO_LOG_FILE with colour coding by level.
+# _NECRO_TUI_LEFT_PANE — static dermal manifest (left panel)
+# Shows what will be installed, grouped by category.
 # ════════════════════════════════════════════════════════════
 _necro_tui_left_pane() {
-    local log="${NECRO_LOG_FILE:-$HOME/.local/share/necrodermis/install.log}"
-
     printf "${CLS}"
     echo ""
-    echo -e "${G}${B}  INSTALL LOG${NC}"
+    echo -e "${G}${B}  DERMAL MANIFEST${NC}"
     echo -e "${DG}  ─────────────────────────────${NC}"
     echo ""
+    echo -e "${DG}  CORE SYSTEMS${NC}"
+    echo -e "${G}  ·  CANOPTEK SHELL${NC}       ${DG}Hyprland compositor${NC}"
+    echo -e "${G}  ·  STASIS LOCK${NC}          ${DG}Hyprlock screen locker${NC}"
+    echo -e "${G}  ·  SIGNAL ARRAY${NC}         ${DG}Waybar status bar${NC}"
+    echo -e "${G}  ·  TOMB INTERFACE${NC}        ${DG}Rofi launcher${NC}"
+    echo -e "${G}  ·  CORTEX NODE${NC}          ${DG}Kitty terminal${NC}"
+    echo -e "${G}  ·  COMMAND DIALECT${NC}       ${DG}Fish shell${NC}"
+    echo -e "${G}  ·  SYSTEM MANIFEST${NC}       ${DG}Fastfetch readout${NC}"
+    echo -e "${G}  ·  CANOPTEK ALERTS${NC}       ${DG}Swaync notifications${NC}"
+    echo ""
+    echo -e "${DG}  VISUAL LAYER${NC}"
+    echo -e "${G}  ·  DERMAL SKIN${NC}          ${DG}GTK / Qt / Kvantum${NC}"
+    echo -e "${G}  ·  ICONOGRAPHY${NC}          ${DG}Flat Remix Necrodermis${NC}"
+    echo -e "${G}  ·  TOMB MURALS${NC}          ${DG}Necron wallpapers${NC}"
+    echo -e "${G}  ·  PROCESS CRYPT${NC}        ${DG}Btop monitor${NC}"
+    echo -e "${G}  ·  RESONANCE ARRAY${NC}       ${DG}Cava visualiser${NC}"
+    echo -e "${G}  ·  AWAKENING GATE${NC}        ${DG}SDDM login screen${NC}"
+    echo -e "${G}  ·  BOOT SEQUENCE${NC}         ${DG}GRUB theme${NC}"
+    echo ""
+    echo -e "${DG}  TOMB HARDENING${NC}"
+    echo -e "${G}  ·  PERIMETER WARD${NC}        ${DG}ufw firewall${NC}"
+    echo -e "${G}  ·  CORTEX LOCK${NC}          ${DG}Kernel hardening${NC}"
+    echo ""
+    echo -e "${DG}  EXTRAS${NC}"
+    echo -e "${G}  ·  ATMOSPHERIC DATA${NC}      ${DG}Sitrep / METAR weather${NC}"
+    echo ""
+    echo -e "${DG}  ─────────────────────────────${NC}"
+    echo -e "${DG}  tomb world awaits${NC}"
 
-    # Wait for log to exist
-    while [[ ! -f "$log" ]]; do
-        echo -e "${DG}  Waiting for log...${NC}"
-        sleep 1
-        printf "${CLS}"
-        echo ""
-        echo -e "${G}${B}  INSTALL LOG${NC}"
-        echo -e "${DG}  ─────────────────────────────${NC}"
-        echo ""
-    done
-
-    # Tail and colourize by level
-    tail -f "$log" 2>/dev/null | while IFS= read -r line; do
-        local color="${DG}"
-        [[ "$line" =~ \[OK\]    ]] && color="${G}"
-        [[ "$line" =~ \[SKIP\]  ]] && color="${Y}"
-        [[ "$line" =~ \[FAIL\]  ]] && color="${R}"
-        [[ "$line" =~ \[FUBAR\] ]] && color="${R}${B}"
-        [[ "$line" =~ \[CRIT\]  ]] && color="${R}${B}"
-        [[ "$line" =~ \[NURSE\] ]] && color="${Y}${B}"
-        [[ "$line" =~ \[INFO\]  ]] && color="${DG}"
-        echo -e "${color}  ${line}${NC}"
-    done
+    # Hold pane open until session dies
+    while true; do sleep 60; done
 }
 
 
