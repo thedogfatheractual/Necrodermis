@@ -179,6 +179,9 @@ fi
 echo -e "  ${DG}  Distribution:${NC} ${G}${B}${DISTRO}${NC}"
 echo ""
 
+install_yay
+necro_init_log
+
 mode=$(gum choose \
     --header="  SELECT INSTALLATION MODE" \
     "Theme only  //  apply Necrodermis to existing Hyprland setup" \
@@ -199,8 +202,6 @@ case "$mode" in
         echo -e "${B}  ─────────────────────────────────────────────────────────────${NC}"
         echo ""
         if confirm "Initiate full awakening sequence?"; then
-            necro_init_log
-            install_yay
             configure_timezone
             check_deps
             run_selective
