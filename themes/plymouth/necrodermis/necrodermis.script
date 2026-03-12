@@ -84,7 +84,7 @@ boot_lines = [
 // ~145 lines at avg ~3 ticks = ~435 ticks @ 50fps = ~8.7 seconds
 
 shutdown_lines = [
-    ["SAUTEKH DYNASTY — TOMBWORLD VI HIBERNATION PROTOCOL",                           0.0, 1.0,  0.267],
+    ["SAUTEKH DYNASTY — NECRODERMIS HIBERNATION PROTOCOL",                           0.0, 1.0,  0.267],
     ["PHAERON AUTHORITY CONFIRMED. CASCADE SHUTDOWN INITIATED.",                       0.0, 1.0,  0.267],
     ["",                                                                               0.0, 0.0,  0.0  ],
     ["[ I ] THREAT ASSESSMENT — FINAL SWEEP",                                         0.0, 0.6,  0.2  ],
@@ -224,7 +224,7 @@ shutdown_lines = [
     ["WE WILL REMEMBER.",                                                              0.0, 1.0,  0.267],
     ["",                                                                               0.0, 0.0,  0.0  ],
     [">> PHAERON CONSCIOUSNESS ARCHIVED. LAST ENTRY SEALED.",                         0.0, 0.2,  0.067],
-    [">> TOMBWORLD VI — DARK.",                                                        0.0, 0.2,  0.067],
+    [">> NECRODERMIS — DARK.",                                                        0.0, 0.2,  0.067],
 ];
 
 // ── LINE COUNTS ───────────────────────────────────────────────
@@ -338,7 +338,7 @@ fun shutdown_callback() {
     line_counter = 0;
     next_threshold = ticks_for_line(0);
     hdr1.SetImage(Image.Text(
-        "SAUTEKH DYNASTY — TOMBWORLD VI HIBERNATION PROTOCOL",
+        "SAUTEKH DYNASTY — NECRODERMIS HIBERNATION PROTOCOL",
         0.0, 1.0, 0.267, 1, FONT_HDR));
     hdr2.SetImage(Image.Text(
         "-- CASCADE SHUTDOWN SEQUENCE ENGAGED --",

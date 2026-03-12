@@ -180,6 +180,7 @@ echo -e "  ${DG}  Distribution:${NC} ${G}${B}${DISTRO}${NC}"
 echo ""
 
 install_yay
+            install_cachyos_repos
 necro_init_log
 
 mode=$(gum choose \
@@ -222,20 +223,13 @@ esac
 
 bundle_uninstaller
 
-necro_tui_done
 necro_post_install_report
 
+necro_tui_done
+
 echo ""
-echo -e "${G}${B}"
-echo "  ╔══════════════════════════════════════════════════════════════╗"
-echo "  ║           NECRODERMIS INSTALLATION COMPLETE                  ║"
-echo "  ║           ALL SYSTEMS NOMINAL  //  TOMB WORLD VI ONLINE      ║"
-echo "  ╚══════════════════════════════════════════════════════════════╝"
-echo -e "${NC}"
 echo -e "  ${DG}  Configuration archive: ${G}${BACKUP_DIR}${NC}"
-echo ""
-echo -e "  ${DG}  TO UNINSTALL NECRODERMIS:${NC}"
-echo -e "  ${G}    necrodermis-uninstall${NC}"
+echo -e "  ${DG}  TO UNINSTALL: ${G}necrodermis-uninstall${NC}"
 echo ""
 echo -e "  ${DG}  Log out and back in for all changes to take effect.${NC}"
 echo ""

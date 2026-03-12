@@ -125,5 +125,4 @@ EOF
     sudo systemctl enable necrodermis-weather.service 2>/dev/null || true
     print_ok "Atmospheric service armed  ${DG}//  activates at next boot${NC}"
 
-    configure_location
 }

@@ -39,7 +39,7 @@ print_header() {
     echo "  ║          ██║ ╚████║███████╗╚██████╗██║  ██║╚██████╔╝            ║"
     echo "  ║          ╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝             ║"
     echo "  ║                                                                 ║"
-    echo "  ║          ~~   SAUTEKH DYNASTY  //  TOMBWORLD VI   ~~            ║"
+    echo "  ║          ~~   SAUTEKH DYNASTY  //  NECRODERMIS   ~~            ║"
     echo "  ║       ~~   AWAKENING PROTOCOL INITIATED // v0.1.0   ~~          ║"
     echo "  ║                                                                 ║"
     echo "  ╚═════════════════════════════════════════════════════════════════╝"

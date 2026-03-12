@@ -321,7 +321,7 @@ necro_tui_launch() {
     tmux set-option -t "$NECRO_TUI_SESSION" status-left \
         "#[fg=colour2,bold]  ${version}  //  SAUTEKH DYNASTY  //  AWAKENING SEQUENCE  "
     tmux set-option -t "$NECRO_TUI_SESSION" status-right \
-        "#[fg=colour2,bold]  TOMB WORLD VI  //  %H:%M:%S  "
+        "#[fg=colour2,bold]  NECRODERMIS  //  %H:%M:%S  "
     tmux set-option -t "$NECRO_TUI_SESSION" status-interval 1
 
     # ── Pane borders ──

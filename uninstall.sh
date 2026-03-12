@@ -57,7 +57,7 @@ print_header() {
     echo "  ║          ██║ ╚████║███████╗╚██████╗██║  ██║╚██████╔╝            ║"
     echo "  ║          ╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝            ║"
     echo "  ║                                                                  ║"
-    echo "  ║              DEACTIVATION PROTOCOL  //  TOMBWORLD VI             ║"
+    echo "  ║              DEACTIVATION PROTOCOL  //  NECRODERMIS             ║"
     echo "  ║           RETURNING TO STASIS  //  v${NECRO_VERSION}                       ║"
     echo "  ║                                                                  ║"
     echo "  ╚══════════════════════════════════════════════════════════════════╝"
