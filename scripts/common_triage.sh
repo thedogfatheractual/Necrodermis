@@ -481,7 +481,7 @@ necro_group_install() {
     echo ""
 
     local group_answer
-    if [[ -z "${WAYLAND_DISPLAY:-}" && -z "${DISPLAY:-}" ]]; then
+    if true; then
         group_answer="timeout"
         print_info "TTY mode  //  auto-confirming: ${group_label}"
     else
