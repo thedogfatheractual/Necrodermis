@@ -20,5 +20,4 @@ COMPONENTS=(
     "Firewall|SYSTEM|ufw deny-incoming, LAN rules for Steam/Sunshine|install_firewall"
     "Hardening|SYSTEM|Kernel params, root lock, hidepid|install_hardening"
     "Sitrep|EXTRAS|METAR weather for SDDM and terminal|install_sitrep"
-    "CachyOS Repos|EXTRAS|Optimised packages, kernel, schedulers — v3/v4 CPUs only|install_cachyos_repos"
 )

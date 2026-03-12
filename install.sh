@@ -180,6 +180,7 @@ echo -e "  ${DG}  Distribution:${NC} ${G}${B}${DISTRO}${NC}"
 echo ""
 
 install_yay
+            install_cachyos_repos
 necro_init_log
 
 mode=$(gum choose \
@@ -203,7 +204,8 @@ case "$mode" in
         echo ""
         if confirm "Initiate full awakening sequence?"; then
             configure_timezone
-            check_deps
+            install_cachyos_repos
+	    check_deps
             run_selective
         else
             echo -e "\n  ${DG}  The tomb remains sealed. Installer aborted.${NC}\n"
