@@ -6,6 +6,8 @@
 # ════════════════════════════════════════════════════════════
 
 install_hyprland_base() {
+    NECRO_STAGE_CURRENT=0
+    NECRO_STAGE_TOTAL=11
     print_section "HYPRLAND SUBSTRATE  //  TOMB WORLD AWAKENING PREREQUISITES"
 
     # ── System prereqs ────────────────────────────────────────

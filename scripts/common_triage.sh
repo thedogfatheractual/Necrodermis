@@ -14,6 +14,8 @@ NECRO_TRIAGE_MAX_ATTEMPTS=3   # Max triage checks before circuit break
 NECRO_TRIAGE_TIMEOUT=30       # Seconds before a single triage attempt is abandoned
 NECRO_NURSE_TIMEOUT=10        # Seconds to wait at nurse prompt before limping on
 NECRO_CRITICAL_TIMEOUT=30     # Seconds to wait at critical prompt before exit
+NECRO_STAGE_CURRENT=0
+NECRO_STAGE_TOTAL=0
 
 
 # ════════════════════════════════════════════════════════════
@@ -639,8 +641,13 @@ necro_group_install() {
     [[ "$pkg_manager" == *"_critical" ]] && is_critical="true"
 
     # ── Display group header ──
+    (( NECRO_STAGE_CURRENT++ )) || true
+    local stage_tag=""
+    if (( NECRO_STAGE_TOTAL > 0 )); then
+        stage_tag="  //  STAGE ${NECRO_STAGE_CURRENT}/${NECRO_STAGE_TOTAL}"
+    fi
     echo ""
-    echo -e "  ${G}${B}  ┌─ ${group_label} ─────────────────────────────────${NC}"
+    echo -e "  ${G}${B}  ┌─ ${group_label}${stage_tag} ─────────────────────────────────${NC}"
     for pkg in "${pkgs[@]}"; do
         echo -e "  ${DG}  │  · ${pkg}${NC}"
     done
