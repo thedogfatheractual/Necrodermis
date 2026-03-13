@@ -9,7 +9,7 @@ install_fonts() {
         ttf-terminus-nerd \
         ttf-iosevka-nerd \
         ttf-sourcecodepro-nerd \
-        ttf-meslo-nerd-font-powerlevel10k
+        ttf-meslo-nerd
 
     fc-cache -fv &>/dev/null
     print_ok "Glyph substrate loaded  ${DG}//  Terminess · Iosevka · SourceCodePro · Meslo${NC}"

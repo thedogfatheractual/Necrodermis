@@ -21,6 +21,8 @@ COMPONENTS=(
     "Plymouth|VISUAL|Initramfs awakening sequence|install_plymouth"
     "Firewall|SYSTEM|ufw deny-incoming, LAN rules for Steam/Sunshine|install_firewall"
     "Hardening|SYSTEM|Kernel params, root lock, hidepid|install_hardening"
+    "TTY Banner|SYSTEM|Pariah Nexus tomb terminal inscription|install_issue"
+    "MOTD|SYSTEM|Operator briefing — security + lore|install_motd"
     "Sitrep|CORE|METAR weather for SDDM and terminal|install_sitrep"
     "Brave|EXTRAS|Encrypted browser|install_brave"
     "Thunar|EXTRAS|File manager + plugins|install_thunar"

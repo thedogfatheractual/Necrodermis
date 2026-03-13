@@ -128,6 +128,7 @@ install_hyprland_base() {
     xdg-user-dirs-update \
         || necro_log "FAIL" "xdg-user-dirs" "xdg-user-dirs-update failed"
     print_info "Binding SDDM display manager  //  enabling on next boot..."
+    sudo pacman -S --needed --noconfirm sddm
     sudo systemctl enable sddm \
         || necro_log "FAIL" "sddm" "systemctl enable sddm failed"
     necro_log "OK" "sddm" "SDDM enabled"

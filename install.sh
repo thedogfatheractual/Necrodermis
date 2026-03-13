@@ -18,7 +18,7 @@ done
 if ! command -v gum &>/dev/null; then
     echo "  Acquiring gum (required for installer interface)..."
     if command -v pacman &>/dev/null; then
-        command sudo pacman -S --needed --noconfirm gum
+        command sudo pacman -S --needed --noconfirm gum python3
     else
         echo "  ERROR: gum not found and pacman unavailable — install gum manually and re-run."
         exit 1
