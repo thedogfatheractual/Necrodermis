@@ -15,7 +15,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_SH="$SCRIPT_DIR/install.sh"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+INSTALL_SH="$REPO_ROOT/install.sh"
 
 # ── Colour palette ────────────────────────────────────────────────────────────
 G='\033[0;32m'
