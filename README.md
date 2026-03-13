@@ -251,38 +251,10 @@ Or just run `necrodermis-uninstall` and select hardening — it handles all of t
 
 ---
 
-## CACHYOS REPOSITORIES
-
-On compatible hardware, Necrodermis can add the CachyOS repositories to any Arch-based system — EndeavourOS, vanilla Arch, Manjaro — and transform it into something approaching a CachyOS install.
-
-### Hardware requirement
-
-CachyOS packages are compiled for **x86-64-v3 minimum** (AVX2, BMI2). This means:
-
-| CPU Generation | Level | Compatible |
-|---|---|---|
-| Intel Haswell (2013) and newer | v3+ | ✅ |
-| AMD Ryzen (Zen+) and newer | v3+ | ✅ |
-| Intel Ivy Bridge / Sandy Bridge | v2 | ❌ |
-| AMD pre-Ryzen | v2 or lower | ❌ |
-
-The installer detects your CPU level automatically and skips this section if your hardware can't run it.
-
-### What gets added
-
-- **CachyOS repos** — packages recompiled with LTO, PGO, and x86-64-v3/v4 flags. Faster binaries system-wide.
-- **CachyOS kernel** (`linux-cachyos`) — BORE scheduler, full CachyOS compile flags, lower latency
-- **scx-scheds** — userspace schedulers. `scx_lavd` is the one you want: latency-aware, gaming-optimised, autopilot mode just works
-- **cachyos-gaming-meta** — gamemode, mangohud, proton-cachyos, wine-cachyos, and supporting tools in one package
-
-### After installing the CachyOS kernel
-
 If you're on GRUB:
 ```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 ```
-
-Then reboot and select `linux-cachyos` from the boot menu. Once confirmed working, you can set it as default in `/etc/default/grub`.
 
 ### Switching schedulers
 
