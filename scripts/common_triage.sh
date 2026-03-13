@@ -296,7 +296,7 @@ necro_triage() {
     necro_log "INFO" "$component" "Triage initiated  //  failed: $failed_cmd"
     print_info "Triage engaged  //  ${component}"
 
-    _triage_check() {
+    _necro_triage_check() {
         (( attempts++ ))
         local elapsed=$(( $(date +%s) - start_time ))
         if (( attempts > NECRO_TRIAGE_MAX_ATTEMPTS )); then
@@ -311,7 +311,7 @@ necro_triage() {
     }
 
     # ── CHECK 1: yay not in PATH ──
-    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
+    _necro_triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     if [[ "$failure_type" == "yay" ]] && ! command -v yay &>/dev/null; then
         what_we_tried+="[yay re-init] "
         if source "${SCRIPT_DIR}/scripts/functions/yay.sh" 2>/dev/null && install_yay 2>/dev/null; then
@@ -324,7 +324,7 @@ necro_triage() {
     fi
 
     # ── CHECK 2: pacman fallback ──
-    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
+    _necro_triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     if [[ "$failure_type" == "yay" ]]; then
         what_we_tried+="[pacman fallback] "
         local pkg_name
@@ -338,7 +338,7 @@ necro_triage() {
     fi
 
     # ── CHECK 3: binary in PATH ──
-    _triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
+    _necro_triage_check || { necro_nurse "$component" "$failed_cmd" "${what_we_tried:-none}" "$is_critical"; return $?; }
     what_we_tried+="[path hunt] "
     local bin_name
     bin_name=$(echo "$failed_cmd" | awk '{print $1}')
@@ -431,31 +431,6 @@ necro_yay_critical() {
 
 
 # ════════════════════════════════════════════════════════════
-# NECRO_PRINT_SUMMARY
-# ════════════════════════════════════════════════════════════
-necro_print_summary() {
-    echo ""
-    print_section "INSTALLATION REPORT  //  TOMB WORLD DIAGNOSTIC SUMMARY"
-    echo ""
-    echo -e "  ${G}  ✓  Successful:${NC}  ${NECRO_OK_COUNT}"
-    echo -e "  ${Y}  ·  Skipped:${NC}    ${NECRO_SKIP_COUNT}"
-    echo -e "  ${R}  ✗  Failed:${NC}     ${NECRO_FAIL_COUNT}"
-    echo ""
-    if (( NECRO_FAIL_COUNT > 0 )); then
-        grep -E "\[(FAIL |FUBAR|NURSE|CRIT )\]" "$NECRO_LOG_FILE" 2>/dev/null \
-            | while IFS= read -r line; do echo -e "  ${DG}  $line${NC}"; done
-        echo ""
-        echo -e "  ${G}    cat ${NECRO_LOG_FILE}${NC}"
-        echo -e "  ${G}    bash ~/Necrodermis/install.sh --resume${NC}"
-        echo -e "  ${G}    https://github.com/thedogfatheractual/Necrodermis/issues${NC}"
-    else
-        echo -e "  ${G}  All components installed without incident.${NC}"
-    fi
-    echo ""
-}
-
-
-# ════════════════════════════════════════════════════════════
 # NECRO_GROUP_INSTALL
 # ════════════════════════════════════════════════════════════
 necro_group_install() {
@@ -481,7 +456,7 @@ necro_group_install() {
     echo ""
 
     local group_answer
-    if true; then
+    if ! command -v gum &>/dev/null || [[ ! -t 0 ]]; then
         group_answer="timeout"
         print_info "TTY mode  //  auto-confirming: ${group_label}"
     else
@@ -659,9 +634,11 @@ necro_post_install_report() {
                 command -v loginctl &>/dev/null && loginctl terminate-user "$USER" \
                     || pkill -KILL -u "$USER" ;;
             *"ARCH WIKI"* | *"WIKI"*)
-                command -v xdg-open &>/dev/null \
-                    && xdg-open "https://wiki.archlinux.org" &>/dev/null & \
-                    || echo -e "  ${G}  https://wiki.archlinux.org${NC}"
+                if command -v xdg-open &>/dev/null; then
+                    xdg-open "https://wiki.archlinux.org" &>/dev/null &
+                else
+                    echo -e "  ${G}  https://wiki.archlinux.org${NC}"
+                fi
                 read -rp "  Press ENTER to return..." _
                 continue ;;
             *)

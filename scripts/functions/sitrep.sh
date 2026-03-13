@@ -48,7 +48,7 @@ install_sitrep() {
     # ── Pull Sitrep.py from repo ──
     print_info "Acquiring Sitrep from repo..."
     if ! command -v git &>/dev/null; then
-        sudo pacman -S git --noconfirm
+        necro_pkg "git" "git" "git" "git" "git"
     fi
 
     local tmp_dir

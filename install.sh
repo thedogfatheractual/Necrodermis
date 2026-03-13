@@ -15,6 +15,10 @@ for arg in "$@"; do
 done
 
 # ── WRITE NECRODERMIS MOTD IMMEDIATELY ──
+if ! sudo grep -q "lecture=never" /etc/sudoers.d/necrodermis 2>/dev/null; then
+    echo "Defaults lecture=never" | sudo tee /etc/sudoers.d/necrodermis > /dev/null
+    sudo chmod 440 /etc/sudoers.d/necrodermis
+fi
 sudo tee /etc/motd > /dev/null << 'MOTD'
 
   ── OPERATOR CLEARANCE CONFIRMED ───────────────────────────────────────────
@@ -101,6 +105,7 @@ fi
 # ── SOURCE ALL MODULES ──
 source "$SCRIPT_DIR/scripts/common.sh"
 source "$SCRIPT_DIR/scripts/detect.sh"
+source "$SCRIPT_DIR/scripts/pkg.sh"
 source "$SCRIPT_DIR/scripts/configure.sh"
 source "$SCRIPT_DIR/scripts/icao.sh"
 source "$SCRIPT_DIR/installer/components.sh"
@@ -108,6 +113,22 @@ source "$SCRIPT_DIR/installer/components.sh"
 for fn in "$SCRIPT_DIR/scripts/functions/"*.sh; do
     source "$fn"
 done
+
+# ── DISTRO BOOTSTRAP  //  repo setup before any packages touch the system ──
+if [[ -f "$SCRIPT_DIR/scripts/distro/${NECRO_DISTRO}.sh" ]]; then
+    source "$SCRIPT_DIR/scripts/distro/${NECRO_DISTRO}.sh"
+    necro_distro_bootstrap
+fi
+
+# ── REGISTER STAGE MANIFEST WITH TUI ──
+# Build the id|Label list from COMPONENTS so the right pane is fully populated
+_tui_stages=()
+for _entry in "${COMPONENTS[@]}"; do
+    IFS='|' read -r _name _cat _desc _fn <<< "$_entry"
+    _tui_stages+=("${_fn}|${_name}")
+done
+necro_tui_init "${_tui_stages[@]}"
+unset _tui_stages _entry _name _cat _desc _fn
 
 # ════════════════════════════════════════════════════════════
 # COMPONENT SELECTION
@@ -246,6 +267,11 @@ esac
 bundle_uninstaller
 
 necro_post_install_report
+
+# ── Operator codex — post-install briefing ──
+if [[ -f "$SCRIPT_DIR/scripts/necro-codex.sh" ]]; then
+    bash "$SCRIPT_DIR/scripts/necro-codex.sh"
+fi
 
 necro_tui_done
 

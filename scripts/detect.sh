@@ -5,12 +5,49 @@
 # ════════════════════════════════════════════════════════════
 
 detect_distro() {
-    if grep -qi "cachyos" /etc/os-release 2>/dev/null; then echo "cachyos"
-    elif grep -qi "manjaro" /etc/os-release 2>/dev/null; then echo "manjaro"
-    elif grep -qi "endeavouros" /etc/os-release 2>/dev/null; then echo "arch"
-    elif grep -qi "arch" /etc/os-release 2>/dev/null; then echo "arch"
-    else echo "unknown"
+    # ── Arch family ───────────────────────────────────────────────────────────
+    if grep -qi "cachyos" /etc/os-release 2>/dev/null; then echo "cachyos"; return
+    elif grep -qi "manjaro" /etc/os-release 2>/dev/null; then echo "manjaro"; return
+    elif grep -qi "endeavouros" /etc/os-release 2>/dev/null; then echo "arch"; return
+    elif grep -qi "^ID=arch" /etc/os-release 2>/dev/null; then echo "arch"; return
+    elif grep -qi "arch" /etc/os-release 2>/dev/null; then echo "arch"; return
     fi
+
+    # ── Fedora ────────────────────────────────────────────────────────────────
+    if grep -qi "^ID=fedora" /etc/os-release 2>/dev/null; then
+        echo "fedora"; return
+    fi
+
+    # ── openSUSE Tumbleweed  (not Leap — Hyprland only in Tumbleweed) ─────────
+    if grep -qi "tumbleweed" /etc/os-release 2>/dev/null; then
+        echo "opensuse"; return
+    fi
+
+    # ── Void Linux ────────────────────────────────────────────────────────────
+    if grep -qi "^ID=void" /etc/os-release 2>/dev/null; then
+        echo "void"; return
+    fi
+
+    echo "unknown"
+}
+
+# Returns the canonical package manager for the current distro
+detect_pkg_manager() {
+    case "$(detect_distro)" in
+        arch|cachyos|manjaro) echo "pacman" ;;
+        fedora)               echo "dnf"    ;;
+        opensuse)             echo "zypper" ;;
+        void)                 echo "xbps"   ;;
+        *)                    echo "unknown" ;;
+    esac
+}
+
+# Returns true if distro is Arch-family
+is_arch_family() {
+    case "$(detect_distro)" in
+        arch|cachyos|manjaro) return 0 ;;
+        *) return 1 ;;
+    esac
 }
 
 get_aur_helper() {
