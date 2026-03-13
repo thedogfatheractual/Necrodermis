@@ -1,139 +1,159 @@
 #!/usr/bin/env bash
-# ════════════════════════════════════════════════════════════
-# NECRODERMIS — CANOPTEK MAINTENANCE PROTOCOL
-# scripts/necro-autoupdate.sh
-#
-# Runs on Hyprland login via exec-once.
-# Syncs the tomb world with the greater network.
-# Detects critical updates — prompts reboot if required.
-# ════════════════════════════════════════════════════════════
+# Necrodermis — necro-autoupdate.sh
+# Canoptek Update Relay — dials the tomb world for new directives
+
+NECRO_REPO="$HOME/.local/share/necrodermis/repo"
+NECRO_BACKUP_DIR="$HOME/.local/share/necrodermis/update-backups/$(date +%Y%m%d-%H%M%S)"
+NECRO_REMOTE="https://github.com/thedogfatheractual/Necrodermis"
 
 G='\033[0;32m'
 DG='\033[2;32m'
+B='\033[1m'
 Y='\033[0;33m'
 R='\033[0;31m'
-B='\033[1m'
 NC='\033[0m'
 
-# Packages that warrant a reboot if updated
-REBOOT_TRIGGERS=(
-    linux
-    linux-cachyos
-    linux-cachyos-rc
-    linux-lts
-    linux-zen
-    linux-hardened
-    linux-firmware
-    systemd
-    systemd-libs
-    glibc
-    glibc-locales
-    nvidia
-    nvidia-dkms
-    amdgpu
-    mesa
-    vulkan-radeon
-    initramfs
-)
+_header() {
+    echo ""
+    echo -e "${G}${B}  ══════════════════════════════════════════════════${NC}"
+    echo -e "${G}${B}  CANOPTEK UPDATE RELAY  //  SAUTEKH DYNASTY${NC}"
+    echo -e "${G}${B}  ══════════════════════════════════════════════════${NC}"
+    echo ""
+}
 
-clear
-echo ""
-echo -e "${G}${B}  ╔══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${G}${B}  ║   NECRODERMIS  //  CANOPTEK MAINTENANCE PROTOCOL            ║${NC}"
-echo -e "${G}${B}  ║   SAUTEKH DYNASTY  //  TOMB WORLD SYNCHRONISATION           ║${NC}"
-echo -e "${G}${B}  ╚══════════════════════════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "${DG}  The tomb world is synchronising with the greater network.${NC}"
-echo -e "${DG}  This window will close automatically when complete.${NC}"
-echo -e "${DG}  No action required.${NC}"
-echo ""
-echo -e "${G}${B}  ─────────────────────────────────────────────────────────────${NC}"
-echo ""
+_section() {
+    echo ""
+    echo -e "${G}  ── $1 ──────────────────────────────${NC}"
+    echo ""
+}
 
-# Run update, capture output for reboot detection
-UPDATE_LOG=$(mktemp)
+_info()  { echo -e "${DG}  ·  $1${NC}"; }
+_ok()    { echo -e "${G}  ✓  $1${NC}"; }
+_warn()  { echo -e "${Y}  ⚠  $1${NC}"; }
+_err()   { echo -e "${R}  ✗  $1${NC}"; }
+
+_header
+
+# ── PHASE 1 — SYSTEM PACKAGE SYNC ────────────────────────────────────────────
+_section "PHASE I  //  SYNCHRONISING TOMB WORLD PACKAGE REGISTRY"
+_info "Dispatching Canoptek scarabs to the AUR..."
+_info "This may take several minutes — tomb maintenance in progress."
+echo ""
 
 if command -v yay &>/dev/null; then
-    yay -Syyu --noconfirm --noprogressbar 2>&1 | tee "$UPDATE_LOG"
-elif command -v pacman &>/dev/null; then
-    echo -e "${Y}  yay unavailable — falling back to pacman${NC}"
-    echo ""
-    sudo pacman -Syyu --noconfirm --noprogressbar 2>&1 | tee "$UPDATE_LOG"
+    yay -Syyu --noconfirm
+    _ok "Package registry synchronised  //  all dynasties updated"
+elif command -v paru &>/dev/null; then
+    paru -Syyu --noconfirm
+    _ok "Package registry synchronised  //  all dynasties updated"
 else
-    echo -e "${R}  No package manager found — skipping synchronisation${NC}"
-    rm -f "$UPDATE_LOG"
-    sleep 3
+    _warn "No AUR helper found  //  skipping package sync"
+fi
+
+# ── PHASE 2 — NECRODERMIS CONFIG RELAY ───────────────────────────────────────
+_section "PHASE II  //  DIALLING TOMB WORLD CONFIG RELAY"
+_info "Establishing uplink to github.com/thedogfatheractual/Necrodermis..."
+
+# Clone repo to temp if not already cached
+NECRO_TMP=$(mktemp -d)
+trap "rm -rf $NECRO_TMP" EXIT
+
+if ! git clone --depth=1 "$NECRO_REMOTE" "$NECRO_TMP" &>/dev/null; then
+    _err "Uplink failed  //  tomb world unreachable"
+    _info "Check your connection — config sync skipped"
     exit 1
 fi
 
-echo ""
-echo -e "${G}${B}  ─────────────────────────────────────────────────────────────${NC}"
-echo ""
+_ok "Uplink established  //  remote tomb world responding"
 
-# Check if any reboot-triggering packages were updated
-REBOOT_NEEDED=false
-REBOOT_PKGS=()
+# ── PHASE 3 — DIFF CONFIGS ────────────────────────────────────────────────────
+_section "PHASE III  //  SCANNING FOR CANOPTEK DIRECTIVES"
+_info "Comparing local dermal layer against remote tomb world..."
 
-for pkg in "${REBOOT_TRIGGERS[@]}"; do
-    if grep -qE "upgrading ${pkg}$|installing ${pkg}$|reinstalling ${pkg}$" "$UPDATE_LOG" 2>/dev/null; then
-        REBOOT_NEEDED=true
-        REBOOT_PKGS+=("$pkg")
+CHANGED_FILES=()
+CONFIG_SRC="$NECRO_TMP/configs"
+
+while IFS= read -r -d '' remote_file; do
+    rel_path="${remote_file#$CONFIG_SRC/}"
+    local_file="$HOME/.config/$rel_path"
+
+    if [[ -f "$local_file" ]]; then
+        if ! diff -q "$remote_file" "$local_file" &>/dev/null; then
+            CHANGED_FILES+=("$rel_path")
+            _warn "Updated directive detected  //  $rel_path"
+        fi
+    else
+        CHANGED_FILES+=("$rel_path")
+        _info "New directive detected  //  $rel_path"
     fi
+done < <(find "$CONFIG_SRC" -type f -print0)
+
+if [[ ${#CHANGED_FILES[@]} -eq 0 ]]; then
+    _ok "Dermal layer is current  //  no tomb world updates detected"
+    echo ""
+    echo -e "${G}${B}  CANOPTEK RELAY COMPLETE  //  ALL SYSTEMS NOMINAL${NC}"
+    echo ""
+    exit 0
+fi
+
+echo ""
+_info "${#CHANGED_FILES[@]} updated directive(s) available from the tomb world"
+
+# ── PHASE 4 — OFFER CHOICE ───────────────────────────────────────────────────
+_section "PHASE IV  //  AWAITING OPERATOR DIRECTIVE"
+echo -e "${Y}  The following files differ from the remote tomb world:${NC}"
+echo ""
+for f in "${CHANGED_FILES[@]}"; do
+    echo -e "${DG}    ·  $f${NC}"
+done
+echo ""
+
+if command -v gum &>/dev/null; then
+    CHOICE=$(gum choose \
+        --header="  Deploy updated directives from tomb world?" \
+        --header.foreground="2" \
+        --cursor.foreground="2" \
+        --item.foreground="7" \
+        "  YES — backup existing and deploy updates" \
+        "  NO  — ignore for now")
+else
+    echo -e "${Y}  Deploy updates? [y/N]:${NC} "
+    read -r CHOICE
+    [[ "$CHOICE" =~ ^[Yy]$ ]] && CHOICE="YES" || CHOICE="NO"
+fi
+
+if [[ "$CHOICE" != *"YES"* ]]; then
+    _info "Operator dismissed update  //  tomb world directives ignored"
+    echo ""
+    echo -e "${G}${B}  CANOPTEK RELAY COMPLETE  //  STANDING BY${NC}"
+    echo ""
+    exit 0
+fi
+
+# ── PHASE 5 — BACKUP AND DEPLOY ──────────────────────────────────────────────
+_section "PHASE V  //  DEPLOYING TOMB WORLD DIRECTIVES"
+mkdir -p "$NECRO_BACKUP_DIR"
+_info "Archiving existing dermal layer  //  $NECRO_BACKUP_DIR"
+
+for f in "${CHANGED_FILES[@]}"; do
+    local_file="$HOME/.config/$f"
+    if [[ -f "$local_file" ]]; then
+        backup_dest="$NECRO_BACKUP_DIR/$f"
+        mkdir -p "$(dirname "$backup_dest")"
+        cp "$local_file" "$backup_dest"
+        _info "Archived  //  $f"
+    fi
+
+    remote_file="$CONFIG_SRC/$f"
+    dest="$HOME/.config/$f"
+    mkdir -p "$(dirname "$dest")"
+    cp "$remote_file" "$dest"
+    _ok "Deployed  //  $f"
 done
 
-rm -f "$UPDATE_LOG"
-
-if [[ "$REBOOT_NEEDED" == "true" ]]; then
-    echo ""
-    echo -e "${Y}${B}  ╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${Y}${B}  ║                                                              ║${NC}"
-    echo -e "${Y}${B}  ║   STRUCTURAL RECALIBRATION REQUIRED                         ║${NC}"
-    echo -e "${Y}${B}  ║   Critical tomb world components were updated.              ║${NC}"
-    echo -e "${Y}${B}  ║   A reboot is recommended to finalise integration.          ║${NC}"
-    echo -e "${Y}${B}  ║                                                              ║${NC}"
-    echo -e "${Y}${B}  ╚══════════════════════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "  ${Y}  Updated critical components:${NC}"
-    for pkg in "${REBOOT_PKGS[@]}"; do
-        echo -e "  ${DG}  ·  ${pkg}${NC}"
-    done
-    echo ""
-
-    if command -v gum &>/dev/null; then
-        choice=$(gum choose \
-            --header="  CANOPTEK DIRECTIVE  //  reboot to complete integration?" \
-            --header.foreground="3" \
-            --cursor.foreground="2" \
-            --selected.foreground="2" \
-            --item.foreground="7" \
-            "  REBOOT NOW     //  recommended — finalise canoptek conversion" \
-            "  LATER          //  I know what I'm doing" \
-        2>/dev/null) || choice="LATER"
-    else
-        echo -e "  ${G}  [R]${NC} Reboot now   ${G}[L]${NC} Later"
-        echo ""
-        read -rp "  → " raw_choice
-        case "${raw_choice,,}" in
-            r) choice="REBOOT" ;;
-            *) choice="LATER"  ;;
-        esac
-    fi
-
-    case "$choice" in
-        *"REBOOT"*)
-            echo ""
-            echo -e "${G}${B}  Initiating reboot sequence...${NC}"
-            sleep 2
-            systemctl reboot
-            ;;
-        *)
-            echo ""
-            echo -e "${DG}  Reboot deferred. The tomb remembers.${NC}"
-            sleep 3
-            ;;
-    esac
-else
-    echo -e "${G}${B}  ✓  Synchronisation complete. Tomb world is current.${NC}"
-    echo ""
-    sleep 2
-fi
+echo ""
+_ok "Tomb world directives deployed  //  ${#CHANGED_FILES[@]} file(s) updated"
+_info "Backups archived at  //  $NECRO_BACKUP_DIR"
+echo ""
+echo -e "${G}${B}  CANOPTEK RELAY COMPLETE  //  THE DYNASTY ENDURES${NC}"
+echo ""

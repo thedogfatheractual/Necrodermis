@@ -134,4 +134,9 @@ install_hyprland_base() {
     print_ok "SDDM  ${DG}//  display manager enabled${NC}"
 
     print_ok "Hyprland substrate online  ${DG}//  the tomb world stirs${NC}"
+    # Deploy autoupdate relay
+    mkdir -p "$NECRO_HOME"
+    cp "$SCRIPT_DIR/scripts/necro-autoupdate.sh" "$NECRO_HOME/necro-autoupdate.sh"
+    chmod +x "$NECRO_HOME/necro-autoupdate.sh"
+    print_ok "Canoptek update relay deployed  ${DG}//  $NECRO_HOME/necro-autoupdate.sh${NC}"
 }
