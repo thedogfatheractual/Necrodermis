@@ -290,7 +290,7 @@ _detect_and_route() {
 _acquire_gum
 _splash
 _detect_and_route
- — skip selection, go straight to confirm
+# — skip selection, go straight to confirm
 if [[ -n "$MODE" ]]; then
     _confirm_mode
     _handoff
