@@ -14,6 +14,31 @@ for arg in "$@"; do
     [[ "$arg" == "--debug" ]] && NECRO_DEBUG=1
 done
 
+# ── WRITE NECRODERMIS MOTD IMMEDIATELY ──
+sudo tee /etc/motd > /dev/null << 'MOTD'
+
+  ── OPERATOR CLEARANCE CONFIRMED ───────────────────────────────────────────
+
+  NECRODERMIS has granted you root-level access to this tomb world node.
+  The following directives are non-negotiable.
+
+  · Root access is a weapon. Wield it with intent, not habit.
+  · During install you will be offered to lock the root account. This is
+    recommended — sudo remains fully functional, direct root login is sealed.
+  · Unverified packages are dimensional rifts. Do not open them.
+  · Your sudo log is a diagnostic record. Review it.
+  · Encryption is a stasis field. Enable it where it matters.
+
+  The Silent King did not survive 60 million years by being careless.
+  Neither will you.
+
+  COMMANDS: sysupdate · sysclean · necrodermis-uninstall
+  If the tomb collapses — run the installer again. NECRODERMIS is eternal.
+
+  ──────────────────────────────────────────────────────────────────────────
+MOTD
+
+
 # ── GUM BOOTSTRAP ──
 if ! command -v gum &>/dev/null; then
     echo "  Acquiring gum (required for installer interface)..."
