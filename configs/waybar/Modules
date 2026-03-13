@@ -98,7 +98,7 @@
 "clock": {
 	"interval": 1,
     //"format": " {:%I:%M %p}", // AM PM format
-    "format": " {:%H:%M:%S}", // 24H
+    "format": " {:%H:%M:%S  //  %d/%m/%Y}", // 24H
 	"format-alt": " {:L%H:%M   %Y, %d %B, %A}",
 	"tooltip-format": "<tt><small>{calendar}</small></tt>",
 	"calendar": {
