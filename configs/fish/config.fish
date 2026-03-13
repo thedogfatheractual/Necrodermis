@@ -3,8 +3,15 @@
 # Suppress greeting
 set fish_greeting ""
 
+# Auto-start Hyprland on TTY1
+if status is-login
+    if test (tty) = /dev/tty1
+        and not set -q WAYLAND_DISPLAY
+        exec Hyprland
+    end
+end
+
 # done plugin settings
-source /usr/share/cachyos-fish-config/conf.d/done.fish
 set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
 
