@@ -106,4 +106,8 @@ _hyprlock_install_hardcoded() {
     necro_print "hyprlock" "Installing hardcoded Necrodermis palette..."
     necro_run cp "$src" "$dest"
     necro_print "hyprlock" "Hardcoded palette installed."
+    # Scale hyprlock positions to primary monitor resolution
+    if [[ -f "$SCRIPT_DIR/scripts/necro-hyprlock-scale.sh" ]]; then
+        bash "$SCRIPT_DIR/scripts/necro-hyprlock-scale.sh"
+    fi
 }
