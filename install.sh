@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════
-# NECRODERMIS — SAUTEKH DYNASTY // v0.1.0
+# NECRODERMIS — SAUTEKH DYNASTY // v$(cat "$(dirname "${BASH_SOURCE[0]}")/VERSION" 2>/dev/null || echo "?.?.?")
 # Install Script — Arch / CachyOS / Manjaro / EndeavourOS
 # https://github.com/thedogfatheractual/Necrodermis
 #
