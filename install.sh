@@ -204,7 +204,6 @@ case "$mode" in
             configure_timezone
             check_deps
             run_selective
-            install_cachyos_repos
         else
             echo -e "\n  ${DG}  The tomb remains sealed. Installer aborted.${NC}\n"
             exit 0
