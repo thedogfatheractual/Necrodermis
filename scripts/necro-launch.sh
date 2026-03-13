@@ -247,8 +247,8 @@ _detect_and_route() {
     # ── Linux — check distro support ─────────────────────────────────────────
     local distro
     # Source detect.sh to get detect_distro
-    if [[ -f "$SCRIPT_DIR/scripts/detect.sh" ]]; then
-        source "$SCRIPT_DIR/scripts/detect.sh"
+    if [[ -f "$SCRIPT_DIR/detect.sh" ]]; then
+        source "$SCRIPT_DIR/detect.sh"
     fi
     distro="$(detect_distro 2>/dev/null || echo "unknown")"
 
