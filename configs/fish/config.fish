@@ -84,6 +84,16 @@ alias ll='eza -l --color=always --group-directories-first --icons'
 alias lt='eza -aT --color=always --group-directories-first --icons'
 alias l.="eza -a | grep -e '^\.'"
 
+# ── NECRODERMIS OPERATOR NOTES ────────────────────────────────────────────────
+# You know the rules. Root is a weapon, packages from source are rifts,
+# keep the tomb current. If it breaks — the installer remembers.
+#
+# NECRODERMIS COMMANDS:
+#   sysupdate   — yay -Syyu  //  full system + AUR sync
+#   sysclean    — purge orphans, tmp, journal, cache  //  tomb maintenance
+#   logout      — hyprctl dispatch exit
+#   necrodermis-uninstall  — removes the dermal layer cleanly
+# ───────────────────────────────────────────────────────────────────────────────
 # Necrodermis aliases
 alias sysupdate='yay -Syyu'
 alias sysclean='sudo pacman -Scc && sudo pacman -Rns (pacman -Qtdq) 2>/dev/null; sudo journalctl --vacuum-time=2weeks && sudo rm -rf /tmp/* && paccache -rk2 && echo Done.'
