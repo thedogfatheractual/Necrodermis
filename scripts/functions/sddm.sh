@@ -95,7 +95,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=$USER
-ExecStart=$WEATHER_PYTHON $NECRO_WEATHER_PY
+ExecStart=/bin/bash -c 'python=$([ -f $HOME/.local/share/sitrep_install/venv/bin/python ] && echo $HOME/.local/share/sitrep_install/venv/bin/python || command -v python3); exec $python '$NECRO_WEATHER_PY
 
 [Install]
 WantedBy=multi-user.target
