@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/btop.sh
+# NECRODERMIS — scripts/functions/btop.sh
 # Component: install_btop
 
 install_btop() {

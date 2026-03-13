@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/thunar.sh
+# NECRODERMIS — scripts/functions/thunar.sh
 # Component: install_thunar
 
 install_thunar() {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/wallpapers.sh
+# NECRODERMIS — scripts/functions/wallpapers.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_wallpapers
 

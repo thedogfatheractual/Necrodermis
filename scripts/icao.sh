@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/icao.sh
+# NECRODERMIS — scripts/icao.sh
 # Timezone → ICAO lookup table
 # Sourced by install.sh — do not run directly
 # ── TIMEZONE → ICAO LOOKUP TABLE ──

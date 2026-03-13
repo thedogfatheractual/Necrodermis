@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — touchpad-toggle.sh
+# NECRODERMIS — touchpad-toggle.sh
 # Toggles touchpad enabled/disabled via hyprctl
 
 DEVICE=$(hyprctl devices -j | python3 -c "

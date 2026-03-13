@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/qt.sh
+# NECRODERMIS — scripts/functions/qt.sh
 # Component: install_qt
 
 install_qt() {

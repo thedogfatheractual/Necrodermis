@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/swaync.sh
+# NECRODERMIS — scripts/functions/swaync.sh
 # Component: install_swaync
 
 install_swaync() {

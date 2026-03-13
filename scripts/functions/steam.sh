@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/steam.sh
+# NECRODERMIS — scripts/functions/steam.sh
 # Component: install_steam
 
 install_steam() {

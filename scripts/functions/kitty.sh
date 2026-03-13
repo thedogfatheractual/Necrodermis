@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/kitty.sh
+# NECRODERMIS — scripts/functions/kitty.sh
 # Component: install_kitty
 
 install_kitty() {

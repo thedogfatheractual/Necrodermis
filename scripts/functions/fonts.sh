@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/fonts.sh
+# NECRODERMIS — scripts/functions/fonts.sh
 # Component: install_fonts
 
 install_fonts() {

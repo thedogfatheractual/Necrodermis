@@ -1,4 +1,4 @@
-# Necrodermis — fish config
+# NECRODERMIS — fish config
 
 # Suppress greeting
 set fish_greeting ""
@@ -112,5 +112,5 @@ alias tb='nc termbin.com 9999'
 # Restrict default file permissions
 umask 027
 
-# Necrodermis — system manifest on terminal launch
+# NECRODERMIS — system manifest on terminal launch
 fastfetch

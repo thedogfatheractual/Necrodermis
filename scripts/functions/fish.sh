@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/fish.sh
+# NECRODERMIS — scripts/functions/fish.sh
 # Component: install_fish
 
 install_fish() {

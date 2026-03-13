@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/yay.sh
+# NECRODERMIS — scripts/functions/yay.sh
 # Component: install_yay
 
 install_yay() {

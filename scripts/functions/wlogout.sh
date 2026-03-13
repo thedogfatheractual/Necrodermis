@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/wlogout.sh
+# NECRODERMIS — scripts/functions/wlogout.sh
 # Component: install_wlogout
 
 install_wlogout() {

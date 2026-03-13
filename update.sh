@@ -26,7 +26,7 @@ print_header() {
     echo "  ╔═════════════════════════════════════════════════════════════════╗"
     echo "  ║                                                                 ║"
     echo "  ║      CANOPTEK SYNCHRONISATION PROTOCOL — ONLINE                ║"
-    echo "  ║      NECRODERMIS // SAUTEKH DYNASTY // UPDATE SEQUENCE         ║"
+    echo "  ║      NECRODERMIS // UPDATE SEQUENCE         ║"
     echo "  ║                                                                 ║"
     echo "  ╚═════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"

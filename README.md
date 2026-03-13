@@ -1,4 +1,4 @@
-# NECRODERMIS — ENTIRE SYSTEM CONVERSION
+# NECRODERMIS
 
 ```
 STASIS DURATION: 60,247,891 YRS  //  47 MAINTENANCE FAULTS UNRESOLVED
@@ -59,8 +59,7 @@ The installer will ask you:
 
 1. **Theme only** — skins an existing Hyprland setup, component by component, your choice what gets installed
 2. **Full install** — sets up a complete Arch desktop via JaKooLit, then layers Necrodermis on top
-3. **For both** - sudo auth for installation/changes to certain files
-   
+
 Nothing is overwritten without a backup being taken first. Your previous configs are archived to `~/.config/necrodermis-backup-<timestamp>/` before anything is touched.
 
 During SDDM setup you'll be asked for your nearest city or airport — this powers the weather widget on the login screen. You can skip it if you don't want weather.
@@ -309,7 +308,7 @@ sudo systemctl restart scx
 ORGANIC MATTER IS TEMPORARY  //  NECRODERMIS IS ETERNAL
 ```
 
-The Sautekh Dynasty does not theme desktops.
+Necrodermis does not theme desktops.
 It awakens them.
 
 ---

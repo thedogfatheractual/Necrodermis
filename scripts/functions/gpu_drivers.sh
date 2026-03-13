@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/gpu_drivers.sh
+# NECRODERMIS — scripts/functions/gpu_drivers.sh
 # Component: install_gpu_drivers
 
 install_gpu_drivers() {

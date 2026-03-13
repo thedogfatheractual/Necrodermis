@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/sddm.sh
+# NECRODERMIS — scripts/functions/sddm.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_sddm
 
@@ -49,7 +49,7 @@ install_sddm() {
         sudo cp "$SCRIPT_DIR/themes/sddm/necrodermis/necrodermis.conf" "$THEME_DIR/Themes/necrodermis.conf"
         # Point metadata.desktop at our profile
         sudo sed -i 's|^ConfigFile=.*|ConfigFile=Themes/necrodermis.conf|' "$THEME_DIR/metadata.desktop"
-        print_ok "Sautekh theme profile deployed  ${DG}//  Themes/necrodermis.conf${NC}"
+        print_ok "NECRODERMIS theme profile deployed  ${DG}//  Themes/necrodermis.conf${NC}"
     else
         print_err "necrodermis.conf not found — SDDM will use astronaut defaults"
     fi

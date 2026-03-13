@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/brave.sh
+# NECRODERMIS — scripts/functions/brave.sh
 # Component: install_brave
 
 install_brave() {

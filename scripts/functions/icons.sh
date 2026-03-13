@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/icons.sh
+# NECRODERMIS — scripts/functions/icons.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_icons
 

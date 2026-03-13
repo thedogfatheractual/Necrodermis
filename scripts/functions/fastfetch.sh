@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/fastfetch.sh
+# NECRODERMIS — scripts/functions/fastfetch.sh
 # Component: install_fastfetch
 
 install_fastfetch() {

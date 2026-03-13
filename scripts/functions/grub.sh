@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/grub.sh
+# NECRODERMIS — scripts/functions/grub.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_grub
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/cachyos_repos.sh
+# NECRODERMIS — scripts/functions/cachyos_repos.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_cachyos_repos
 

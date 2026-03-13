@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════
-# NECRODERMIS — SAUTEKH DYNASTY
+# NECRODERMIS
 # Uninstall Script — Arch / Manjaro / EndeavourOS
 # https://github.com/thedogfatheractual/Necrodermis
 #

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/waybar.sh
+# NECRODERMIS — scripts/functions/waybar.sh
 # Component: install_waybar
 
 install_waybar() {

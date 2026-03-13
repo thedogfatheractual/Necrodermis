@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/plymouth.sh
+# NECRODERMIS — scripts/functions/plymouth.sh
 # Component: install_plymouth
 
 install_plymouth() {

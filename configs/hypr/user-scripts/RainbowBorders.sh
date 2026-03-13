@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# /* ---- SAUTEKH DYNASTY — NECRON BORDER PROTOCOL ---- */
+# /* ---- NECRODERMIS — NECRON BORDER PROTOCOL ---- */
 # Two-color gradient flow: neon Necron green glow crawling over deep void green
 # Slow, deliberate — like a Necron waking from stasis
 
 # Kill any previous instance of this script to avoid stacking
 [[ -n "$FLOCKER" ]] || exec env FLOCKER="$$" flock -en "$0" "$0" "$@" || exit 0
 
-# ---------- SAUTEKH TWO-COLOR PALETTE ----------
+# ---------- NECRODERMIS TWO-COLOR PALETTE ----------
 NEON="0xff00ff00"    # Necron green — gauss glow peak
 MID="0xff00cc00"     # mid green — glow shoulder
 DEEP="0xff006600"    # deep green — base field

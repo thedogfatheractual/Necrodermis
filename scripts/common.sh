@@ -39,7 +39,7 @@ print_header() {
     echo "  ║          ██║ ╚████║███████╗╚██████╗██║  ██║╚██████╔╝            ║"
     echo "  ║          ╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝             ║"
     echo "  ║                                                                 ║"
-    echo "  ║          ~~   SAUTEKH DYNASTY  //  NECRODERMIS   ~~            ║"
+    echo "  ║          ~~   NECRODERMIS   ~~            ║"
     local _ver; _ver=$(cat "$SCRIPT_DIR/VERSION" 2>/dev/null || echo "?.?.?")
     echo "  ║       ~~   AWAKENING PROTOCOL INITIATED // v${_ver}   ~~          ║"
     echo "  ║                                                                 ║"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — necro-autoupdate.sh
+# NECRODERMIS — necro-autoupdate.sh
 # Canoptek Update Relay — dials the tomb world for new directives
 
 NECRO_REPO="$HOME/.local/share/necrodermis/repo"
@@ -16,7 +16,7 @@ NC='\033[0m'
 _header() {
     echo ""
     echo -e "${G}${B}  ══════════════════════════════════════════════════${NC}"
-    echo -e "${G}${B}  CANOPTEK UPDATE RELAY  //  SAUTEKH DYNASTY${NC}"
+    echo -e "${G}${B}  CANOPTEK UPDATE RELAY  //  NECRODERMIS${NC}"
     echo -e "${G}${B}  ══════════════════════════════════════════════════${NC}"
     echo ""
 }

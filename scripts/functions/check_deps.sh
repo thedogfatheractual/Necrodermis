@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/check_deps.sh
+# NECRODERMIS — scripts/functions/check_deps.sh
 
 check_deps() {
     print_section "PRE-FLIGHT DIAGNOSTIC  //  SCANNING TOMB SYSTEMS"

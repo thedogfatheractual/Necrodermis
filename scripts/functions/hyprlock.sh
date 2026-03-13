@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/hyprlock.sh
+# NECRODERMIS — scripts/functions/hyprlock.sh
 # Installs hyprlock config with palette toggle:
 #   Y (default) — wallust dynamic colors, registered as a wallust template
-#   N           — hardcoded Necrodermis Sautekh palette
+#   N           — hardcoded NECRODERMIS palette
 
 install_hyprlock() {
     local HYPR_DIR="$HOME/.config/hypr"

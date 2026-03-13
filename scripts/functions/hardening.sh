@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/hardening.sh
+# NECRODERMIS — scripts/functions/hardening.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_hardening
 
@@ -135,7 +135,7 @@ EOF
     if [ -f "$CONFIG_DIR/fish/config.fish" ]; then
         if ! grep -q "umask 027" "$CONFIG_DIR/fish/config.fish"; then
             echo "" >> "$CONFIG_DIR/fish/config.fish"
-            echo "# Necrodermis — restrict default file permissions" >> "$CONFIG_DIR/fish/config.fish"
+            echo "# NECRODERMIS — restrict default file permissions" >> "$CONFIG_DIR/fish/config.fish"
             echo "umask 027" >> "$CONFIG_DIR/fish/config.fish"
             print_ok "umask 027 set  ${DG}//  new files not world-readable by default${NC}"
         else

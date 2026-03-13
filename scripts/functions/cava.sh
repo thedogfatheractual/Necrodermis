@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/cava.sh
+# NECRODERMIS — scripts/functions/cava.sh
 # Component: install_cava
 
 install_cava() {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/hypr.sh
+# NECRODERMIS — scripts/functions/hypr.sh
 # Component: install_hypr
 
 install_hypr() {

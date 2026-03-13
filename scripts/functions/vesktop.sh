@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/vesktop.sh
+# NECRODERMIS — scripts/functions/vesktop.sh
 # Component: install_vesktop
 
 install_vesktop() {

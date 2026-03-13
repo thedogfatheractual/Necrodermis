@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/rofi.sh
+# NECRODERMIS — scripts/functions/rofi.sh
 # Component: install_rofi
 
 install_rofi() {

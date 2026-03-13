@@ -1,5 +1,5 @@
 #!/bin/bash
-# NECRODERMIS — SAUTEKH DYNASTY
+# NECRODERMIS
 # Weather fetcher for SDDM — Aviation Weather Center METAR
 # Change ICAO to your nearest airport
 

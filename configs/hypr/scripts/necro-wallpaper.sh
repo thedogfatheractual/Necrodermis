@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — random wallpaper rotator
+# NECRODERMIS — random wallpaper rotator
 # Picks a random image from $wallDIR every 15 minutes
 
 WALL_DIR="$HOME/Pictures/wallpapers/necrodermis"

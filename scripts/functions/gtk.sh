@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Necrodermis — scripts/functions/gtk.sh
+# NECRODERMIS — scripts/functions/gtk.sh
 # Extracted from monolith install-OGSHELL.sh
 # Component: install_gtk
 
