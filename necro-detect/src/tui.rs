@@ -19,6 +19,31 @@ pub struct SysStats {
     pub ram_used_gb:  f32,
     pub ram_total_gb: f32,
     pub disk_pct:     u8,
+    pub net_rx_kbps:  u32,   // KB/s receive
+    pub net_tx_kbps:  u32,   // KB/s transmit
+    pub net_iface:    String, // active interface name
+}
+
+/// Read total rx/tx bytes from /proc/net/dev for the most active non-loopback iface.
+fn read_net_bytes() -> Option<(String, u64, u64)> {
+    let content = fs::read_to_string("/proc/net/dev").ok()?;
+    let mut best: Option<(String, u64, u64)> = None;
+    for line in content.lines().skip(2) {
+        let line = line.trim();
+        let colon = line.find(':')?;
+        let iface = line[..colon].trim().to_string();
+        if iface == "lo" { continue; }
+        let fields: Vec<u64> = line[colon+1..].split_whitespace()
+            .filter_map(|s| s.parse().ok()).collect();
+        if fields.len() < 9 { continue; }
+        let rx = fields[0];
+        let tx = fields[8];
+        let total = rx + tx;
+        if best.as_ref().map(|(_, r, t)| total > r + t).unwrap_or(true) {
+            best = Some((iface, rx, tx));
+        }
+    }
+    best
 }
 
 fn read_proc_stat() -> Option<(u64, u64)> {
@@ -36,16 +61,20 @@ fn read_proc_stat() -> Option<(u64, u64)> {
 
 fn spawn_sysinfo(stats: Arc<Mutex<SysStats>>) {
     thread::spawn(move || {
-        let mut prev = read_proc_stat().unwrap_or((0, 1));
+        let mut prev_cpu = read_proc_stat().unwrap_or((0, 1));
+        let mut prev_net = read_net_bytes().map(|(i, r, t)| (i, r, t));
         loop {
             thread::sleep(Duration::from_secs(1));
+
+            // CPU
             let cpu = if let Some(curr) = read_proc_stat() {
-                let td = curr.1.saturating_sub(prev.1);
-                let id = curr.0.saturating_sub(prev.0);
-                prev = curr;
+                let td = curr.1.saturating_sub(prev_cpu.1);
+                let id = curr.0.saturating_sub(prev_cpu.0);
+                prev_cpu = curr;
                 if td > 0 { ((td - id) * 100 / td) as u8 } else { 0 }
             } else { 0 };
 
+            // RAM
             let (mut ram_total, mut ram_avail) = (0f32, 0f32);
             if let Ok(m) = fs::read_to_string("/proc/meminfo") {
                 for line in m.lines() {
@@ -58,8 +87,11 @@ fn spawn_sysinfo(stats: Arc<Mutex<SysStats>>) {
                 }
             }
 
+            // Disk
             let disk_pct = Command::new("df")
                 .args(["--output=pcent", "/"])
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::null())
                 .output()
                 .ok()
                 .and_then(|o| String::from_utf8(o.stdout).ok())
@@ -67,14 +99,127 @@ fn spawn_sysinfo(stats: Arc<Mutex<SysStats>>) {
                     .and_then(|l| l.trim().trim_end_matches('%').parse::<u8>().ok()))
                 .unwrap_or(0);
 
+            // Network
+            let (net_iface, net_rx_kbps, net_tx_kbps) = if let Some(curr) = read_net_bytes() {
+                let (rx_kbps, tx_kbps) = if let Some(ref prev) = prev_net {
+                    let rx = curr.1.saturating_sub(prev.1) / 1024;
+                    let tx = curr.2.saturating_sub(prev.2) / 1024;
+                    (rx as u32, tx as u32)
+                } else { (0, 0) };
+                let iface = curr.0.clone();
+                prev_net = Some(curr);
+                (iface, rx_kbps, tx_kbps)
+            } else {
+                prev_net = None;
+                ("?".into(), 0, 0)
+            };
+
             if let Ok(mut s) = stats.lock() {
                 s.cpu_pct      = cpu;
                 s.ram_used_gb  = ram_total - ram_avail;
                 s.ram_total_gb = ram_total;
                 s.disk_pct     = disk_pct;
+                s.net_rx_kbps  = net_rx_kbps;
+                s.net_tx_kbps  = net_tx_kbps;
+                s.net_iface    = net_iface;
             }
         }
     });
+}
+
+// ── SysSpecs (read once at launch) ───────────────────────────────────────────
+
+#[derive(Clone, Default)]
+pub struct SysSpecs {
+    pub cpu:      String,
+    pub cores:    String,
+    pub ram_gb:   String,
+    pub gpu:      String,
+    pub kernel:   String,
+    pub hostname: String,
+    pub disk_dev: String,
+    pub disk_gb:  String,
+    pub net_iface:String,
+}
+
+pub fn read_sys_specs() -> SysSpecs {
+    // CPU model
+    let cpu_raw = fs::read_to_string("/proc/cpuinfo").unwrap_or_default()
+        .lines()
+        .find(|l| l.starts_with("model name"))
+        .and_then(|l| l.split(':').nth(1))
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|| "unknown".into());
+    let cpu = cpu_raw
+        .replace("Intel(R) Core(TM) ", "")
+        .replace("AMD Ryzen ", "Ryzen ")
+        .replace(" CPU @ ", " @ ")
+        .replace("(R)", "").replace("(TM)", "");
+
+    // Core count
+    let cores = fs::read_to_string("/proc/cpuinfo").unwrap_or_default()
+        .lines().filter(|l| l.starts_with("processor")).count().to_string();
+
+    // RAM total
+    let ram_kb: u64 = fs::read_to_string("/proc/meminfo").unwrap_or_default()
+        .lines().find(|l| l.starts_with("MemTotal:"))
+        .and_then(|l| l.split_whitespace().nth(1))
+        .and_then(|s| s.parse().ok()).unwrap_or(0);
+    let ram_gb = format!("{:.0}GB", ram_kb as f64 / 1_048_576.0);
+
+    // GPU — try lspci, fall back gracefully
+    let gpu = Command::new("lspci").output().ok()
+        .and_then(|o| String::from_utf8(o.stdout).ok())
+        .and_then(|s| s.lines()
+            .find(|l| l.contains("VGA") || l.contains("3D") || l.contains("Display"))
+            .map(|l| {
+                // strip pci address prefix
+                let after = l.splitn(2, ':').nth(1)
+                    .and_then(|s| s.splitn(2, ':').nth(1))
+                    .unwrap_or(l).trim().to_string();
+                // shorten vendor strings
+                after.replace("Advanced Micro Devices, Inc. [AMD/ATI] ", "AMD ")
+                     .replace("NVIDIA Corporation ", "NVIDIA ")
+                     .replace("Intel Corporation ", "Intel ")
+            }))
+        .unwrap_or_else(|| "unknown".into());
+
+    // Kernel
+    let kernel = Command::new("uname").arg("-r").output().ok()
+        .and_then(|o| String::from_utf8(o.stdout).ok())
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|| "unknown".into());
+
+    // Hostname
+    let hostname = fs::read_to_string("/etc/hostname")
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|_| "unknown".into());
+
+    // Primary disk device + size from lsblk
+    let lsblk = Command::new("lsblk")
+        .args(["-d", "-o", "NAME,SIZE", "--noheadings"])
+        .output().ok()
+        .and_then(|o| String::from_utf8(o.stdout).ok())
+        .unwrap_or_default();
+    let (disk_dev, disk_gb) = lsblk.lines()
+        .find(|l| {
+            let n = l.split_whitespace().next().unwrap_or("");
+            n.starts_with("sd") || n.starts_with("nvme") || n.starts_with("vd")
+        })
+        .map(|l| {
+            let mut it = l.split_whitespace();
+            let dev = it.next().unwrap_or("?").to_string();
+            let sz  = it.next().unwrap_or("?").to_string();
+            (dev, sz)
+        })
+        .unwrap_or_else(|| ("?".into(), "?".into()));
+
+    // Primary network interface
+    let net_iface = read_net_bytes()
+        .map(|(i, _, _)| i)
+        .unwrap_or_else(|| "?".into());
+
+    SysSpecs { cpu, cores, ram_gb, gpu, kernel, hostname, disk_dev, disk_gb, net_iface }
 }
 
 // ── Package manifest ──────────────────────────────────────────────────────────
@@ -160,6 +305,7 @@ pub struct App {
     pub tick:        u64,
     pub quit:        bool,
     pub stats:       Arc<Mutex<SysStats>>,
+    pub specs:       SysSpecs,
 }
 
 impl App {
@@ -170,6 +316,7 @@ impl App {
         }).collect();
         let stats = Arc::new(Mutex::new(SysStats::default()));
         spawn_sysinfo(Arc::clone(&stats));
+        let specs = read_sys_specs();
         App {
             screen: Screen::Splash, distro, family,
             mode: Mode::Dots, mode_cursor: 0,
@@ -178,7 +325,7 @@ impl App {
             done_count: 0, total_count: 0,
             ok_count: 0, skip_count: 0, fail_count: 0,
             install_rx: None, start_time: None,
-            launch_time: Instant::now(), tick: 0, quit: false, stats,
+            launch_time: Instant::now(), tick: 0, quit: false, stats, specs,
         }
     }
 
@@ -399,19 +546,21 @@ fn bar_color(pct: u8) -> Color {
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 
-struct Shell { topbar: Rect, left: Rect, centre: Rect, right: Rect, resbar: Rect }
+struct Shell { topbar: Rect, left: Rect, centre: Rect, right: Rect, divider: Rect, resbar: Rect }
 
 fn shell_layout(area: Rect) -> Shell {
     let w  = area.width;
     let lw = (w as f32 * 0.21) as u16;
     let rw = lw;
     let cw = w.saturating_sub(lw + rw + 2);
+    let main_h = area.height.saturating_sub(3); // topbar + divider + resbar
     Shell {
-        topbar: Rect { x: area.x, y: area.y,         width: w,  height: 1 },
-        left:   Rect { x: area.x,             y: area.y + 1, width: lw, height: area.height.saturating_sub(2) },
-        centre: Rect { x: area.x + lw + 1,    y: area.y + 1, width: cw, height: area.height.saturating_sub(2) },
-        right:  Rect { x: area.x + lw + cw + 2, y: area.y + 1, width: rw, height: area.height.saturating_sub(2) },
-        resbar: Rect { x: area.x, y: area.y + area.height.saturating_sub(1), width: w, height: 1 },
+        topbar:  Rect { x: area.x, y: area.y,             width: w,  height: 1 },
+        left:    Rect { x: area.x,               y: area.y + 1, width: lw, height: main_h },
+        centre:  Rect { x: area.x + lw + 1,      y: area.y + 1, width: cw, height: main_h },
+        right:   Rect { x: area.x + lw + cw + 2, y: area.y + 1, width: rw, height: main_h },
+        divider: Rect { x: area.x, y: area.y + 1 + main_h,  width: w,  height: 1 },
+        resbar:  Rect { x: area.x, y: area.y + 2 + main_h,  width: w,  height: 1 },
     }
 }
 
@@ -422,6 +571,7 @@ fn draw(f: &mut Frame, app: &mut App) {
     let sh = shell_layout(f.area());
     draw_topbar(f, sh.topbar, app);
     draw_dividers(f, &sh);
+    draw_hbar(f, sh.divider);
     draw_resbar(f, sh.resbar, app);
 
     if matches!(app.screen, Screen::Installing | Screen::Codex | Screen::ErrorLog) {
@@ -431,12 +581,12 @@ fn draw(f: &mut Frame, app: &mut App) {
     }
 
     match app.screen {
-        Screen::Splash     => draw_right_splash(f, sh.right),
+        Screen::Splash     => draw_right_splash(f, sh.right, app),
         Screen::ModeSelect => draw_right_mode(f, sh.right, app),
         Screen::Picker     => draw_right_picker(f, sh.right, app),
         Screen::Confirm    => draw_right_confirm(f, sh.right, app),
         Screen::Installing => draw_right_stages(f, sh.right, app),
-        Screen::Codex | Screen::ErrorLog => draw_right_nextsteps(f, sh.right),
+        Screen::Codex | Screen::ErrorLog => draw_right_nextsteps(f, sh.right, app),
     }
 
     match app.screen {
@@ -473,36 +623,58 @@ fn draw_dividers(f: &mut Frame, sh: &Shell) {
     }
 }
 
+fn draw_hbar(f: &mut Frame, area: Rect) {
+    let line = "─".repeat(area.width as usize);
+    f.render_widget(
+        Paragraph::new(line).style(Style::default().fg(Color::Rgb(26, 60, 26)).bg(Color::Black)),
+        area,
+    );
+}
+
+fn fmt_kbps(kbps: u32) -> String {
+    if kbps >= 1024 { format!("{:.1}M", kbps as f32 / 1024.0) }
+    else { format!("{}K", kbps) }
+}
+
 fn draw_resbar(f: &mut Frame, area: Rect, app: &App) {
     let sys       = app.sys();
     let elapsed   = app.elapsed_secs();
     let ram_total = if sys.ram_total_gb > 0.0 { sys.ram_total_gb } else { 1.0 };
-    let bar_w: usize = 20;
+    let bar_w: usize = 12;
 
     let cpu_f  = (sys.cpu_pct as usize * bar_w / 100).min(bar_w);
     let ram_f  = ((sys.ram_used_gb / ram_total * bar_w as f32) as usize).min(bar_w);
     let disk_f = (sys.disk_pct as usize * bar_w / 100).min(bar_w);
 
+    let net_label = if sys.net_iface.is_empty() { "NET".into() }
+                    else { format!("{}", sys.net_iface) };
+
     let spans = vec![
         Span::styled(" CPU [", wh2()),
-        Span::styled("█".repeat(cpu_f),  Style::default().fg(bar_color(sys.cpu_pct))),
+        Span::styled("█".repeat(cpu_f),       Style::default().fg(bar_color(sys.cpu_pct))),
         Span::styled("░".repeat(bar_w - cpu_f), dim()),
         Span::styled(format!("] {:3}%  ", sys.cpu_pct), wh2()),
 
         Span::styled("RAM [", wh2()),
-        Span::styled("█".repeat(ram_f),  Style::default().fg(bar_color((sys.ram_used_gb / ram_total * 100.0) as u8))),
+        Span::styled("█".repeat(ram_f),       Style::default().fg(bar_color((sys.ram_used_gb / ram_total * 100.0) as u8))),
         Span::styled("░".repeat(bar_w - ram_f), dim()),
         Span::styled(format!("] {:.1}/{:.0}GB  ", sys.ram_used_gb, ram_total), wh2()),
 
         Span::styled("DSK [", wh2()),
-        Span::styled("█".repeat(disk_f), Style::default().fg(bar_color(sys.disk_pct))),
+        Span::styled("█".repeat(disk_f),      Style::default().fg(bar_color(sys.disk_pct))),
         Span::styled("░".repeat(bar_w - disk_f), dim()),
         Span::styled(format!("] {:3}%  ", sys.disk_pct), wh2()),
 
+        Span::styled(format!("{} ", net_label), dim()),
+        Span::styled("▼", Style::default().fg(Color::Rgb(0, 136, 102))),
+        Span::styled(format!("{}/s ", fmt_kbps(sys.net_rx_kbps)), wh2()),
+        Span::styled("▲", Style::default().fg(Color::Rgb(136, 102, 0))),
+        Span::styled(format!("{}/s  ", fmt_kbps(sys.net_tx_kbps)), wh2()),
+
         Span::styled(match app.screen {
-            Screen::Picker     => format!("  ↑↓ nav  SPC toggle  A all  ENT confirm  Q back  {:02}:{:02}", elapsed/60, elapsed%60),
-            Screen::Installing => format!("  elapsed {:02}:{:02}", elapsed/60, elapsed%60),
-            _                  => format!("  ENT confirm  Q back  {:02}:{:02}", elapsed/60, elapsed%60),
+            Screen::Picker     => format!("↑↓ nav  SPC toggle  A all  ENT confirm  Q back  {:02}:{:02}", elapsed/60, elapsed%60),
+            Screen::Installing => format!("elapsed {:02}:{:02}", elapsed/60, elapsed%60),
+            _                  => format!("ENT confirm  Q back  {:02}:{:02}", elapsed/60, elapsed%60),
         }, dim()),
     ];
 
@@ -732,10 +904,17 @@ fn pkg_lore(id: &str) -> Option<&'static Lore> {
     PKG_LORE.iter().find(|(k, _)| *k == id).map(|(_, v)| v)
 }
 
-fn draw_right_lore(f: &mut Frame, area: Rect, id: &str, active: bool) {
+fn draw_right_lore(f: &mut Frame, area: Rect, id: &str, active: bool, app: &App) {
     let lore = pkg_lore(id);
     let title_sty = if active { hi() } else { wh() };
-    let mut lines = vec![
+    let specs = &app.specs;
+
+    // How many lines does lore content take? Reserve bottom for specs.
+    // Specs block: separator + HOST + CPU + GPU + RAM + DISK + NET = 8 lines
+    let specs_h: usize = 9;
+    let lore_h = (area.height as usize).saturating_sub(specs_h);
+
+    let mut lines: Vec<Line> = vec![
         Line::from(Span::styled("CONSTRUCT DATA", wh())),
         sep_line(area.width),
         Line::from(""),
@@ -753,27 +932,73 @@ fn draw_right_lore(f: &mut Frame, area: Rect, id: &str, active: bool) {
         lines.push(Line::from(Span::styled("in the Eternity Gate", dim())));
         lines.push(Line::from(Span::styled("archives.", dim())));
     }
+
+    // Pad to push specs to bottom
+    while lines.len() < lore_h.saturating_sub(1) {
+        lines.push(Line::from(""));
+    }
+
+    // Specs section
+    lines.push(sep_line(area.width));
+    lines.push(Line::from(Span::styled("TOMB WORLD SPECS", wh())));
+
+    let w = area.width as usize;
+    let label = |s: &'static str| Span::styled(s, dim());
+    let val   = |s: String| Span::styled(s, wh2());
+
+    // truncate a string to fit the pane width minus label
+    let tr = |s: &str, max: usize| -> String {
+        if s.len() > max { format!("{}…", &s[..max.saturating_sub(1)]) } else { s.to_string() }
+    };
+
+    let hw = w.saturating_sub(6); // label is ~5 chars + space
+
+    lines.push(Line::from(vec![label("HOST  "), val(tr(&specs.hostname, hw))]));
+    lines.push(Line::from(vec![label("CPU   "), val(tr(&specs.cpu, hw))]));
+    lines.push(Line::from(vec![label("CORES "), val(format!("{} threads", specs.cores))]));
+    lines.push(Line::from(vec![label("GPU   "), val(tr(&specs.gpu, hw))]));
+    lines.push(Line::from(vec![label("RAM   "), val(specs.ram_gb.clone())]));
+    lines.push(Line::from(vec![label("DISK  "), val(format!("{} {}", specs.disk_dev, specs.disk_gb))]));
+    lines.push(Line::from(vec![label("NET   "), val(specs.net_iface.clone())]));
+    lines.push(Line::from(vec![label("KRNL  "), val(tr(&specs.kernel, hw))]));
+
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
-fn draw_right_splash(f: &mut Frame, area: Rect) {
-    let lines = vec![
+fn draw_right_splash(f: &mut Frame, area: Rect, app: &App) {
+    let specs = &app.specs;
+    let specs_h: usize = 9;
+    let top_h = (area.height as usize).saturating_sub(specs_h);
+    let w = area.width as usize;
+    let hw = w.saturating_sub(6);
+    let tr = |s: &str, max: usize| -> String {
+        if s.len() > max { format!("{}…", &s[..max.saturating_sub(1)]) } else { s.to_string() }
+    };
+    let label = |s: &'static str| Span::styled(s, dim());
+    let val   = |s: String| Span::styled(s, wh2());
+
+    let mut lines: Vec<Line> = vec![
         Line::from(Span::styled("OPERATOR CLEARANCE", wh())),
         sep_line(area.width),
         Line::from(""),
         Line::from(Span::styled("sudo required", amb())),
         Line::from(Span::styled("Have password ready.", wh2())),
         Line::from(""),
-        Line::from(Span::styled("The tomb requires", wh2())),
-        Line::from(Span::styled("elevated permissions", wh2())),
-        Line::from(Span::styled("to graft the", wh2())),
-        Line::from(Span::styled("Necrodermis layer.", wh2())),
-        Line::from(""),
-        sep_line(area.width),
         Line::from(Span::styled("The Silent King did", dim())),
-        Line::from(Span::styled("not survive 60 million", dim())),
-        Line::from(Span::styled("years by being careless.", dim())),
+        Line::from(Span::styled("not survive 60M yrs", dim())),
+        Line::from(Span::styled("by being careless.", dim())),
     ];
+    while lines.len() < top_h.saturating_sub(1) { lines.push(Line::from("")); }
+    lines.push(sep_line(area.width));
+    lines.push(Line::from(Span::styled("TOMB WORLD SPECS", wh())));
+    lines.push(Line::from(vec![label("HOST  "), val(tr(&specs.hostname, hw))]));
+    lines.push(Line::from(vec![label("CPU   "), val(tr(&specs.cpu, hw))]));
+    lines.push(Line::from(vec![label("CORES "), val(format!("{} threads", specs.cores))]));
+    lines.push(Line::from(vec![label("GPU   "), val(tr(&specs.gpu, hw))]));
+    lines.push(Line::from(vec![label("RAM   "), val(specs.ram_gb.clone())]));
+    lines.push(Line::from(vec![label("DISK  "), val(format!("{} {}", specs.disk_dev, specs.disk_gb))]));
+    lines.push(Line::from(vec![label("NET   "), val(specs.net_iface.clone())]));
+    lines.push(Line::from(vec![label("KRNL  "), val(tr(&specs.kernel, hw))]));
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
@@ -793,23 +1018,54 @@ const MODE_INFO: &[(&str, &[&str])] = &[
 ];
 
 fn draw_right_mode(f: &mut Frame, area: Rect, app: &App) {
+    let specs = &app.specs;
+    let specs_h: usize = 9;
+    let top_h = (area.height as usize).saturating_sub(specs_h);
+    let w = area.width as usize;
+    let hw = w.saturating_sub(6);
+    let tr = |s: &str, max: usize| -> String {
+        if s.len() > max { format!("{}…", &s[..max.saturating_sub(1)]) } else { s.to_string() }
+    };
+    let label = |s: &'static str| Span::styled(s, dim());
+    let val   = |s: String| Span::styled(s, wh2());
     let (title, desc) = MODE_INFO[app.mode_cursor];
     let mut lines = vec![Line::from(Span::styled(title, wh())), sep_line(area.width), Line::from("")];
     for d in desc.iter() {
         lines.push(Line::from(Span::styled(*d, if d.is_empty() { dim() } else { wh2() })));
     }
+    while lines.len() < top_h.saturating_sub(1) { lines.push(Line::from("")); }
+    lines.push(sep_line(area.width));
+    lines.push(Line::from(Span::styled("TOMB WORLD SPECS", wh())));
+    lines.push(Line::from(vec![label("HOST  "), val(tr(&specs.hostname, hw))]));
+    lines.push(Line::from(vec![label("CPU   "), val(tr(&specs.cpu, hw))]));
+    lines.push(Line::from(vec![label("CORES "), val(format!("{} threads", specs.cores))]));
+    lines.push(Line::from(vec![label("GPU   "), val(tr(&specs.gpu, hw))]));
+    lines.push(Line::from(vec![label("RAM   "), val(specs.ram_gb.clone())]));
+    lines.push(Line::from(vec![label("DISK  "), val(format!("{} {}", specs.disk_dev, specs.disk_gb))]));
+    lines.push(Line::from(vec![label("NET   "), val(specs.net_iface.clone())]));
+    lines.push(Line::from(vec![label("KRNL  "), val(tr(&specs.kernel, hw))]));
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
 fn draw_right_picker(f: &mut Frame, area: Rect, app: &App) {
     let entry = &app.packages[app.pkg_cursor];
-    draw_right_lore(f, area, &entry.id.clone(), true);
+    draw_right_lore(f, area, &entry.id.clone(), true, app);
 }
 
 fn draw_right_confirm(f: &mut Frame, area: Rect, app: &App) {
+    let specs = &app.specs;
+    let specs_h: usize = 9;
+    let top_h = (area.height as usize).saturating_sub(specs_h);
+    let w = area.width as usize;
+    let hw = w.saturating_sub(6);
+    let tr = |s: &str, max: usize| -> String {
+        if s.len() > max { format!("{}…", &s[..max.saturating_sub(1)]) } else { s.to_string() }
+    };
+    let label = |s: &'static str| Span::styled(s, dim());
+    let val   = |s: String| Span::styled(s, wh2());
     let sel   = app.packages.iter().filter(|p| p.selected).count();
     let total = app.packages.len();
-    let lines = vec![
+    let mut lines = vec![
         Line::from(Span::styled("MANIFEST SUMMARY", wh())),
         sep_line(area.width),
         Line::from(""),
@@ -824,6 +1080,17 @@ fn draw_right_confirm(f: &mut Frame, area: Rect, app: &App) {
         Line::from(Span::styled("sequence cannot be", wh2())),
         Line::from(Span::styled("interrupted.", wh2())),
     ];
+    while lines.len() < top_h.saturating_sub(1) { lines.push(Line::from("")); }
+    lines.push(sep_line(area.width));
+    lines.push(Line::from(Span::styled("TOMB WORLD SPECS", wh())));
+    lines.push(Line::from(vec![label("HOST  "), val(tr(&specs.hostname, hw))]));
+    lines.push(Line::from(vec![label("CPU   "), val(tr(&specs.cpu, hw))]));
+    lines.push(Line::from(vec![label("CORES "), val(format!("{} threads", specs.cores))]));
+    lines.push(Line::from(vec![label("GPU   "), val(tr(&specs.gpu, hw))]));
+    lines.push(Line::from(vec![label("RAM   "), val(specs.ram_gb.clone())]));
+    lines.push(Line::from(vec![label("DISK  "), val(format!("{} {}", specs.disk_dev, specs.disk_gb))]));
+    lines.push(Line::from(vec![label("NET   "), val(specs.net_iface.clone())]));
+    lines.push(Line::from(vec![label("KRNL  "), val(tr(&specs.kernel, hw))]));
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
@@ -834,7 +1101,7 @@ fn draw_right_stages(f: &mut Frame, area: Rect, app: &App) {
         .or_else(|| app.packages.iter().filter(|p| p.status == PkgStatus::Ok).last())
         .map(|p| p.id.clone());
     if let Some(id) = active_id {
-        draw_right_lore(f, area, &id, true);
+        draw_right_lore(f, area, &id, true, app);
     } else {
         let lines = vec![
             Line::from(Span::styled("CONSTRUCT DATA", wh())),
@@ -847,8 +1114,19 @@ fn draw_right_stages(f: &mut Frame, area: Rect, app: &App) {
     }
 }
 
-fn draw_right_nextsteps(f: &mut Frame, area: Rect) {
-    let lines = vec![
+fn draw_right_nextsteps(f: &mut Frame, area: Rect, app: &App) {
+    let specs = &app.specs;
+    let specs_h: usize = 9;
+    let top_h = (area.height as usize).saturating_sub(specs_h);
+    let w = area.width as usize;
+    let hw = w.saturating_sub(6);
+    let tr = |s: &str, max: usize| -> String {
+        if s.len() > max { format!("{}…", &s[..max.saturating_sub(1)]) } else { s.to_string() }
+    };
+    let label = |s: &'static str| Span::styled(s, dim());
+    let val   = |s: String| Span::styled(s, wh2());
+
+    let mut lines: Vec<Line> = vec![
         Line::from(Span::styled("NEXT STEPS", wh())),
         sep_line(area.width),
         Line::from(""),
@@ -861,10 +1139,20 @@ fn draw_right_nextsteps(f: &mut Frame, area: Rect) {
         Line::from(vec![Span::styled("4 ", teal()), Span::styled("necrodermis-uninstall", wh2())]),
         Line::from(vec![Span::styled("  ", dim()),  Span::styled("to revert", wh2())]),
         Line::from(""),
-        sep_line(area.width),
         Line::from(Span::styled("Q/ENT  exit", dim())),
         Line::from(Span::styled("E      error log", dim())),
     ];
+    while lines.len() < top_h.saturating_sub(1) { lines.push(Line::from("")); }
+    lines.push(sep_line(area.width));
+    lines.push(Line::from(Span::styled("TOMB WORLD SPECS", wh())));
+    lines.push(Line::from(vec![label("HOST  "), val(tr(&specs.hostname, hw))]));
+    lines.push(Line::from(vec![label("CPU   "), val(tr(&specs.cpu, hw))]));
+    lines.push(Line::from(vec![label("CORES "), val(format!("{} threads", specs.cores))]));
+    lines.push(Line::from(vec![label("GPU   "), val(tr(&specs.gpu, hw))]));
+    lines.push(Line::from(vec![label("RAM   "), val(specs.ram_gb.clone())]));
+    lines.push(Line::from(vec![label("DISK  "), val(format!("{} {}", specs.disk_dev, specs.disk_gb))]));
+    lines.push(Line::from(vec![label("NET   "), val(specs.net_iface.clone())]));
+    lines.push(Line::from(vec![label("KRNL  "), val(tr(&specs.kernel, hw))]));
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
