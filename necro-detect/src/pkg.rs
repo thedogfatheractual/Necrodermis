@@ -41,6 +41,22 @@ pub fn build_pkg_map() -> HashMap<String, String> {
     map.insert("cachyos:networkmanager-applet".into(), "network-manager-applet".into());
     map.insert("manjaro:networkmanager-applet".into(), "network-manager-applet".into());
 
+    // brave — AUR only on arch-based
+    map.insert("arch:brave".into(),    "brave-bin".into());
+    map.insert("cachyos:brave".into(), "brave-bin".into());
+    map.insert("manjaro:brave".into(), "brave-bin".into());
+    map.insert("fedora:brave".into(),  "brave-browser".into());
+
+    // vesktop — correct package name (was typo'd as vesktopalled)
+    map.insert("arch:vesktop".into(),    "vesktop".into());
+    map.insert("cachyos:vesktop".into(), "vesktop".into());
+    map.insert("manjaro:vesktop".into(), "vesktop-bin".into());
+
+    // gtk — map to nwg-look for GTK theming on Wayland
+    map.insert("arch:gtk".into(),    "nwg-look".into());
+    map.insert("cachyos:gtk".into(), "nwg-look".into());
+    map.insert("fedora:gtk".into(),  "nwg-look".into());
+
     map
 }
 

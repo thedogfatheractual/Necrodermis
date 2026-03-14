@@ -80,33 +80,33 @@ fn spawn_sysinfo(stats: Arc<Mutex<SysStats>>) {
 // ── Package manifest ──────────────────────────────────────────────────────────
 
 pub struct PkgCat  { pub label: &'static str, pub pkgs: &'static [PkgDef] }
-pub struct PkgDef  { pub id: &'static str, pub necron: &'static str, pub desc: &'static str }
+pub struct PkgDef  { pub id: &'static str, pub necron: &'static str, pub desc: &'static str, pub script_only: bool }
 
 const MANIFEST: &[PkgCat] = &[
     PkgCat { label: "CORE", pkgs: &[
-        PkgDef { id: "hyprland", necron: "CANOPTEK SHELL",  desc: "Hyprland compositor"    },
-        PkgDef { id: "hyprlock", necron: "STASIS LOCK",     desc: "Hyprlock screen locker" },
-        PkgDef { id: "waybar",   necron: "SIGNAL ARRAY",    desc: "Waybar status bar"      },
-        PkgDef { id: "rofi",     necron: "TOMB INTERFACE",  desc: "Rofi launcher"          },
-        PkgDef { id: "kitty",    necron: "CORTEX NODE",     desc: "Kitty terminal"         },
-        PkgDef { id: "fish",     necron: "COMMAND DIALECT", desc: "Fish shell"             },
-        PkgDef { id: "swaync",   necron: "CANOPTEK ALERTS", desc: "SwayNC notifications"   },
+        PkgDef { id: "hyprland", necron: "CANOPTEK SHELL",  desc: "Hyprland compositor", script_only: false },
+        PkgDef { id: "hyprlock", necron: "STASIS LOCK",     desc: "Hyprlock screen locker", script_only: false },
+        PkgDef { id: "waybar",   necron: "SIGNAL ARRAY",    desc: "Waybar status bar", script_only: false },
+        PkgDef { id: "rofi",     necron: "TOMB INTERFACE",  desc: "Rofi launcher", script_only: false },
+        PkgDef { id: "kitty",    necron: "CORTEX NODE",     desc: "Kitty terminal", script_only: false },
+        PkgDef { id: "fish",     necron: "COMMAND DIALECT", desc: "Fish shell", script_only: false },
+        PkgDef { id: "swaync",   necron: "CANOPTEK ALERTS", desc: "SwayNC notifications", script_only: false },
     ]},
     PkgCat { label: "VISUAL", pkgs: &[
-        PkgDef { id: "gtk",    necron: "DERMAL SKIN",    desc: "GTK / Qt / Kvantum"   },
-        PkgDef { id: "walls",  necron: "TOMB MURALS",    desc: "Necron wallpapers"     },
-        PkgDef { id: "btop",   necron: "PROCESS CRYPT",  desc: "btop monitor"          },
-        PkgDef { id: "sddm",   necron: "AWAKENING GATE", desc: "SDDM login screen"     },
-        PkgDef { id: "grub",   necron: "BOOT SEQUENCE",  desc: "GRUB theme"            },
+        PkgDef { id: "gtk",    necron: "DERMAL SKIN",    desc: "GTK / Qt / Kvantum", script_only: false },
+        PkgDef { id: "walls",  necron: "TOMB MURALS",    desc: "Necron wallpapers", script_only: true },
+        PkgDef { id: "btop",   necron: "PROCESS CRYPT",  desc: "btop monitor", script_only: false },
+        PkgDef { id: "sddm",   necron: "AWAKENING GATE", desc: "SDDM login screen", script_only: false },
+        PkgDef { id: "grub",   necron: "BOOT SEQUENCE",  desc: "GRUB theme", script_only: true },
     ]},
     PkgCat { label: "HARDENING", pkgs: &[
-        PkgDef { id: "ufw",    necron: "PERIMETER WARD", desc: "ufw firewall"          },
-        PkgDef { id: "kernel", necron: "CORTEX LOCK",    desc: "Kernel hardening"      },
+        PkgDef { id: "ufw",    necron: "PERIMETER WARD", desc: "ufw firewall", script_only: false },
+        PkgDef { id: "kernel", necron: "CORTEX LOCK",    desc: "Kernel hardening", script_only: true },
     ]},
     PkgCat { label: "EXTRAS", pkgs: &[
-        PkgDef { id: "sitrep",  necron: "ATMOSPHERIC DATA", desc: "Sitrep / METAR weather" },
-        PkgDef { id: "brave",   necron: "COMMS RELAY",      desc: "Brave browser"           },
-        PkgDef { id: "vesktop", necron: "DYNASTY COMMS",    desc: "Vesktop / Discord"       },
+        PkgDef { id: "sitrep",  necron: "ATMOSPHERIC DATA", desc: "Sitrep / METAR weather", script_only: true },
+        PkgDef { id: "brave",   necron: "COMMS RELAY",      desc: "Brave browser", script_only: false },
+        PkgDef { id: "vesktop", necron: "DYNASTY COMMS",    desc: "Vesktop / Discord", script_only: false },
     ]},
 ];
 
@@ -276,7 +276,16 @@ fn handle_key(app: &mut App, key: KeyCode) {
 
 fn start_install(app: &mut App) {
     app.reset_install();
-    let selected: Vec<String> = app.packages.iter().filter(|p| p.selected).map(|p| p.id.clone()).collect();
+    let selected: Vec<(String, bool)> = app.packages.iter()
+        .filter(|p| p.selected)
+        .map(|p| {
+            let so = all_pkg_defs().iter()
+                .find(|d| d.id == p.id)
+                .map(|d| d.script_only)
+                .unwrap_or(false);
+            (p.id.clone(), so)
+        })
+        .collect();
     app.total_count = selected.len();
     app.start_time  = Some(Instant::now());
     app.screen      = Screen::Installing;
@@ -290,8 +299,15 @@ fn start_install(app: &mut App) {
             "void"   => PackageManager::Xbps, _         => PackageManager::Pacman,
         };
         let map = build_pkg_map();
-        for id in &selected {
+        for (id, script_only) in &selected {
             let _ = tx.send(InstallMsg::Starting(id.clone()));
+            if *script_only {
+                let _ = tx.send(InstallMsg::Result(
+                    id.clone(),
+                    InstallResult::Skipped("handled by config scripts".to_string()),
+                ));
+                continue;
+            }
             let resolved = resolve_pkg(&map, &distro, id);
             if let Some((_, result)) = do_install(&pkg_mgr, &[resolved.as_str()]).into_iter().next() {
                 let _ = tx.send(InstallMsg::Result(id.clone(), result));
