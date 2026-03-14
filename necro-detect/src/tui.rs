@@ -434,25 +434,11 @@ fn teal() -> Style { Style::default().fg(Color::Cyan) }
 
 // ── Background scroller ───────────────────────────────────────────────────────
 
-fn draw_bg(f: &mut Frame, app: &App) {
-    let area = f.area();
-    let n = TOMB_LINES.len();
-    let mut lines: Vec<Line> = Vec::with_capacity(area.height as usize);
-    for row in 0..area.height as usize {
-        let idx = (row + app.bg_offset) % n;
-        // repeat line to fill width
-        let base = TOMB_LINES[idx];
-        let mut s = String::new();
-        while s.len() < area.width as usize + base.len() {
-            s.push_str(base);
-            s.push_str("    ");
-        }
-        let start = (app.bg_offset * 3 + row * 7) % base.len().max(1);
-        let slice: String = s.chars().skip(start).take(area.width as usize).collect();
-        lines.push(Line::from(Span::styled(slice,
-            Style::default().fg(Color::Rgb(0, 30, 0)))));
-    }
-    f.render_widget(Paragraph::new(lines), area);
+fn draw_bg(f: &mut Frame, _app: &App) {
+    f.render_widget(
+        Paragraph::new("").style(Style::default().bg(Color::Black)),
+        f.area(),
+    );
 }
 
 // ── Separator helper ──────────────────────────────────────────────────────────
