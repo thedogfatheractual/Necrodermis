@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::process::Command;
+use std::fs::OpenOptions;
+use std::process::{Command, Stdio};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum PackageManager {
@@ -75,21 +76,38 @@ pub fn do_install(pkg_mgr: &PackageManager, pkgs: &[&str]) -> Vec<(String, Insta
             continue;
         }
 
+        let log_file = OpenOptions::new()
+            .create(true).append(true)
+            .open("/tmp/necrodermis-install.log")
+            .ok()
+            .map(Stdio::from);
+        let stderr_sink = log_file.unwrap_or_else(Stdio::null);
+
         let status = match pkg_mgr {
             PackageManager::Pacman => Command::new("sudo")
                 .args(["pacman", "-S", "--needed", "--noconfirm", pkg])
+                .stdout(Stdio::null())
+                .stderr(stderr_sink)
                 .status(),
             PackageManager::Yay => Command::new("yay")
                 .args(["-S", "--needed", "--noconfirm", pkg])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
                 .status(),
             PackageManager::Dnf => Command::new("sudo")
                 .args(["dnf", "install", "-y", pkg])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
                 .status(),
             PackageManager::Zypper => Command::new("sudo")
                 .args(["zypper", "install", "-y", "--no-confirm", pkg])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
                 .status(),
             PackageManager::Xbps => Command::new("sudo")
                 .args(["xbps-install", "-Sy", pkg])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
                 .status(),
         };
 
