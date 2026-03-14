@@ -1,0 +1,86 @@
+<style>
+  .nec{font-family:var(--font-mono);background:#000;color:#00ff00;padding:16px;border:1px solid #00ff00;border-radius:4px;font-size:12px;line-height:1.6}
+  .nec-dim{color:#2a6e2a}
+  .nec-white{color:#e0e0e0}
+  .nec-red{color:#ff3333}
+  .nec-amber{color:#ffaa00}
+  .nec-blue{color:#44aaff}
+  .nec-head{color:#00ff00;font-size:13px;letter-spacing:2px}
+  .nec-blocker{border:1px solid #ff3333;padding:8px;margin:8px 0;background:#0d0000}
+  .nec-block{margin:10px 0 4px;border-top:1px solid #0d3d0d;padding-top:6px}
+  .pulse{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  table{border-collapse:collapse;width:100%;font-family:var(--font-mono);font-size:11px}
+  td{padding:2px 8px;color:#00cc00}
+  td:first-child{color:#2a6e2a;white-space:nowrap}
+  tr:hover td{background:#001a00}
+</style>
+<div class="nec">
+  <div style="text-align:center;margin-bottom:8px">
+    <span class="nec-dim">╔══════════════════════════════════════════════════════╗</span><br>
+    <span class="nec-dim">║</span> <span class="nec-head">NECRODERMIS // TOMB-WORLD DIAGNOSTIC ARRAY v1.3.67</span> <span class="nec-dim">║</span><br>
+    <span class="nec-dim">╚══════════════════════════════════════════════════════╝</span>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+    <span class="nec-dim">STASIS CYCLE: MARCH 13 2026 &nbsp;|&nbsp; REPO: github.com/thedogfatheractual/Necrodermis</span>
+    <span>TOMB INTEGRITY: <span style="color:#00ff00">NOMINAL</span></span>
+  </div>
+
+  <div class="nec-block">
+    <span class="nec-dim">── PROCESSED THIS CYCLE ──────────────────────────────</span>
+    <table style="margin-top:4px">
+      <tr><td>✅</td><td class="nec-white">necro-launch.sh path</td><td class="nec-dim">REPO_ROOT via SCRIPT_DIR — sealed</td></tr>
+      <tr><td>✅</td><td class="nec-white">detect.sh nesting</td><td class="nec-dim">scripts/scripts/ double-path — purged</td></tr>
+      <tr><td>✅</td><td class="nec-white">stray comment frag</td><td class="nec-dim">line 293 executing — as command — excised</td></tr>
+      <tr><td>✅</td><td class="nec-white">NECRO_DISTRO init</td><td class="nec-dim">set before distro bootstrap — correct order</td></tr>
+      <tr><td>✅</td><td class="nec-white">double mode menu</td><td class="nec-dim">--theme-only / --full flags respected</td></tr>
+      <tr><td>✅</td><td class="nec-white">double splash</td><td class="nec-dim">LAUNCHED_FROM_NECRO suppression active</td></tr>
+      <tr><td>✅</td><td class="nec-white">sudo primer</td><td class="nec-dim">lecture deployed, validated pre-privilege</td></tr>
+      <tr><td>✅</td><td class="nec-white">MOTD placement</td><td class="nec-dim">fires post-sudo, not at line 1</td></tr>
+      <tr><td>✅</td><td class="nec-white">Spasskaya restored</td><td class="nec-dim">was overwriting Necrodermis install.sh — fixed</td></tr>
+      <tr><td>✅</td><td class="nec-white">VM Tools component</td><td class="nec-dim">spice-vdagent + sshd — auto-deploys</td></tr>
+      <tr><td>✅</td><td class="nec-white">Sitrep relocated</td><td class="nec-dim">CORE → EXTRAS (media deps)</td></tr>
+    </table>
+  </div>
+
+  <div class="nec-blocker">
+    <span class="nec-red pulse">▶ TOMB BREACH — ACTIVE BLOCKER</span><br>
+    <span class="nec-white">GUM PROMPT INVISIBLE + WRONG COLORS AFTER SPLASH</span><br>
+    <span class="nec-dim" style="font-size:11px">necro-launch.sh — every gum call missing style flags</span><br><br>
+    <span class="nec-dim">REQUIRED ON ALL GUM CALLS:</span><br>
+    <span style="color:#44cc44">&nbsp;&nbsp;--selected.foreground="#00ff00" \<br>
+    &nbsp;&nbsp;--cursor.foreground="#00ff00" \<br>
+    &nbsp;&nbsp;--header.foreground="#00ff00" \<br>
+    &nbsp;&nbsp;--item.foreground="7"</span><br>
+    <span class="nec-dim" style="font-size:11px">FIX THIS BEFORE TOUCHING ANYTHING ELSE.</span>
+  </div>
+
+  <div class="nec-block">
+    <span class="nec-dim">── NEXT SEQUENCE (IN ORDER — DO NOT DEVIATE) ─────────</span>
+    <table style="margin-top:4px">
+      <tr><td><span class="nec-amber">①</span></td><td class="nec-white">Fix gum colors + invisible prompt</td><td class="nec-dim">necro-launch.sh</td></tr>
+      <tr><td><span class="nec-amber">②</span></td><td class="nec-white">SSH into VM</td><td class="nec-dim">ssh dog@192.168.122.210</td></tr>
+      <tr><td><span class="nec-amber">③</span></td><td class="nec-white">Full install run on VM</td><td class="nec-dim">report breakage</td></tr>
+      <tr><td><span class="nec-amber">④</span></td><td class="nec-white">Subdir isolation — Spasskaya + Sitrep</td><td class="nec-dim">prevent install.sh overwrite</td></tr>
+    </table>
+  </div>
+
+  <div class="nec-block">
+    <span class="nec-dim">── BACKLOG — TRACKED / NOT SCHEDULED ─────────────────</span>
+    <table style="margin-top:4px">
+      <tr><td><span class="nec-blue">B1</span></td><td>Hyprlock/SDDM layout unification</td><td class="nec-dim">MED</td></tr>
+      <tr><td><span class="nec-blue">B2</span></td><td>Hyprlock right column scaling</td><td class="nec-dim">MED</td></tr>
+      <tr><td><span class="nec-blue">B3</span></td><td>Left pane manifest — GPU drivers</td><td class="nec-dim">MED</td></tr>
+      <tr><td><span class="nec-blue">B4</span></td><td>Linutit — make optional</td><td class="nec-dim">LOW</td></tr>
+      <tr><td><span class="nec-blue">B5</span></td><td>nvim / init.lua — full build</td><td class="nec-dim">LOW</td></tr>
+      <tr><td><span class="nec-blue">B6</span></td><td>wlogout — decide / wire up</td><td class="nec-dim">LOW</td></tr>
+      <tr><td><span class="nec-blue">B7</span></td><td>README — post clean install</td><td class="nec-dim">LOW</td></tr>
+      <tr><td><span class="nec-blue">B8</span></td><td>Rust rewrite</td><td class="nec-dim">LOWEST — shell version first</td></tr>
+    </table>
+  </div>
+
+  <div style="text-align:center;margin-top:10px">
+    <span class="nec-dim">ORGANIC MATTER IS TEMPORARY &nbsp;//&nbsp; NECRODERMIS IS ETERNAL</span>
+  </div>
+</div>

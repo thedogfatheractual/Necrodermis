@@ -27,6 +27,20 @@ B='\033[1m'
 NC='\033[0m'
 CLS='\033[2J\033[H'
 
+# ── Gum theme — Necrodermis palette ───────────────────────────────────────────
+# common.sh is not sourced here — exports must live in this file
+export GUM_CONFIRM_PROMPT_FOREGROUND="2"
+export GUM_CONFIRM_SELECTED_FOREGROUND="0"
+export GUM_CONFIRM_SELECTED_BACKGROUND="2"
+export GUM_CONFIRM_UNSELECTED_FOREGROUND="8"
+export GUM_INPUT_CURSOR_FOREGROUND="2"
+export GUM_INPUT_PROMPT_FOREGROUND="2"
+export GUM_INPUT_PLACEHOLDER_FOREGROUND="8"
+export GUM_CHOOSE_CURSOR_FOREGROUND="2"
+export GUM_CHOOSE_SELECTED_FOREGROUND="2"
+export GUM_CHOOSE_ITEM_FOREGROUND="7"
+export GUM_CHOOSE_HEADER_FOREGROUND="2"
+
 # ── Arg parsing ───────────────────────────────────────────────────────────────
 MODE=""
 PASSTHROUGH_FLAGS=()
@@ -126,7 +140,7 @@ _select_mode_gum() {
         --header.foreground="2" \
         --cursor.foreground="2" \
         --selected.foreground="2" \
-        --item.foreground="8" \
+        --item.foreground="7" \
         "  DERMAL LAYER ONLY       //  apply Necrodermis to existing Hyprland" \
         "  FULL CANOPTEK CONVERSION //  complete awakening  ·  packages + configs" \
     2>/dev/null) || choice=""
