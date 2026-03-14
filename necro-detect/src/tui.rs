@@ -9,7 +9,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::prelude::*;
 use ratatui::widgets::Paragraph;
 
-use crate::pkg::{InstallResult, PackageManager, build_pkg_map, do_install, resolve_pkg};
+use crate::pkg::{InstallResult, PackageManager, build_pkg_map, do_install, ensure_yay, is_aur, resolve_pkg};
 
 // ── Sysinfo ───────────────────────────────────────────────────────────────────
 
@@ -133,6 +133,7 @@ pub struct PkgEntry {
 pub enum InstallMsg {
     Starting(String),
     Result(String, InstallResult),
+    Log(String),
     Done,
 }
 
@@ -299,6 +300,18 @@ fn start_install(app: &mut App) {
             "void"   => PackageManager::Xbps, _         => PackageManager::Pacman,
         };
         let map = build_pkg_map();
+
+        // Bootstrap yay if we're on arch and any selected pkg needs AUR
+        let needs_aur = selected.iter().any(|(id, so)| {
+            if *so { return false; }
+            let resolved = resolve_pkg(&map, &distro, id);
+            is_aur(&resolved)
+        });
+        if needs_aur && matches!(pkg_mgr, PackageManager::Pacman) {
+            let _ = tx.send(InstallMsg::Log("  bootstrapping yay (AUR helper)...".into()));
+            ensure_yay();
+        }
+
         for (id, script_only) in &selected {
             let _ = tx.send(InstallMsg::Starting(id.clone()));
             if *script_only {
@@ -355,6 +368,9 @@ fn poll_install(app: &mut App) {
                 };
                 app.log_lines.push((format!("  {}  {}{}", label, necron, suffix), color));
                 if app.log_lines.len() > 300 { app.log_lines.drain(..50); }
+            }
+            InstallMsg::Log(msg) => {
+                app.log_lines.push((msg, Color::Rgb(0, 136, 102)));
             }
             InstallMsg::Done => { app.install_rx = None; app.screen = Screen::Codex; break; }
         }

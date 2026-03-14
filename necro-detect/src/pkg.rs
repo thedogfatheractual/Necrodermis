@@ -11,6 +11,45 @@ pub enum PackageManager {
     Xbps,
 }
 
+// Packages that require AUR (yay) on arch-based distros
+const AUR_PKGS: &[&str] = &[
+    "swaynotificationcenter",
+    "brave-bin",
+    "vesktop",
+    "hyprlock",
+    "rofi-wayland",
+    "nwg-look",
+];
+
+pub fn is_aur(pkg: &str) -> bool {
+    AUR_PKGS.contains(&pkg)
+}
+
+/// Ensure yay is available. If not, bootstrap it from AUR via git + makepkg.
+/// Returns true if yay is usable after this call.
+pub fn ensure_yay() -> bool {
+    // Already installed?
+    if Command::new("which").arg("yay").output().map(|o| o.status.success()).unwrap_or(false) {
+        return true;
+    }
+    // Try to build it
+    let log = OpenOptions::new().create(true).append(true)
+        .open("/tmp/necrodermis-install.log").ok().map(Stdio::from);
+    let stderr = log.unwrap_or_else(Stdio::null);
+    let ok = Command::new("bash")
+        .args(["-c",
+            "cd /tmp && rm -rf yay-bin && \
+             git clone https://aur.archlinux.org/yay-bin.git && \
+             cd yay-bin && makepkg -si --noconfirm"
+        ])
+        .stdout(Stdio::null())
+        .stderr(stderr)
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    ok
+}
+
 pub fn build_pkg_map() -> HashMap<String, String> {
     let mut map = HashMap::new();
 
@@ -41,18 +80,18 @@ pub fn build_pkg_map() -> HashMap<String, String> {
     map.insert("cachyos:networkmanager-applet".into(), "network-manager-applet".into());
     map.insert("manjaro:networkmanager-applet".into(), "network-manager-applet".into());
 
-    // brave — AUR only on arch-based
+    // brave — AUR on arch-based
     map.insert("arch:brave".into(),    "brave-bin".into());
     map.insert("cachyos:brave".into(), "brave-bin".into());
     map.insert("manjaro:brave".into(), "brave-bin".into());
     map.insert("fedora:brave".into(),  "brave-browser".into());
 
-    // vesktop — correct package name (was typo'd as vesktopalled)
+    // vesktop
     map.insert("arch:vesktop".into(),    "vesktop".into());
     map.insert("cachyos:vesktop".into(), "vesktop".into());
     map.insert("manjaro:vesktop".into(), "vesktop-bin".into());
 
-    // gtk — map to nwg-look for GTK theming on Wayland
+    // gtk theming
     map.insert("arch:gtk".into(),    "nwg-look".into());
     map.insert("cachyos:gtk".into(), "nwg-look".into());
     map.insert("fedora:gtk".into(),  "nwg-look".into());
@@ -66,11 +105,13 @@ pub fn resolve_pkg(map: &HashMap<String, String>, distro: &str, pkg: &str) -> St
 }
 
 pub fn is_installed(pkg: &str) -> bool {
-    Command::new("pacman")
-        .args(["-Q", pkg])
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
+    // check pacman db first
+    if Command::new("pacman").args(["-Q", pkg]).output()
+        .map(|o| o.status.success()).unwrap_or(false) { return true; }
+    // check yay/AUR db
+    if Command::new("yay").args(["-Q", pkg]).output()
+        .map(|o| o.status.success()).unwrap_or(false) { return true; }
+    false
 }
 
 #[derive(Debug)]
@@ -85,56 +126,52 @@ pub fn do_install(pkg_mgr: &PackageManager, pkgs: &[&str]) -> Vec<(String, Insta
 
     for pkg in pkgs {
         if is_installed(pkg) {
-            results.push((
-                pkg.to_string(),
-                InstallResult::Skipped(format!("{} already installed", pkg)),
-            ));
+            results.push((pkg.to_string(), InstallResult::Skipped(format!("{} already installed", pkg))));
             continue;
         }
 
-        let log_file = OpenOptions::new()
-            .create(true).append(true)
-            .open("/tmp/necrodermis-install.log")
-            .ok()
-            .map(Stdio::from);
+        let log_file = OpenOptions::new().create(true).append(true)
+            .open("/tmp/necrodermis-install.log").ok().map(Stdio::from);
         let stderr_sink = log_file.unwrap_or_else(Stdio::null);
 
-        let status = match pkg_mgr {
-            PackageManager::Pacman => Command::new("sudo")
-                .args(["pacman", "-S", "--needed", "--noconfirm", pkg])
-                .stdout(Stdio::null())
-                .stderr(stderr_sink)
-                .status(),
-            PackageManager::Yay => Command::new("yay")
+        // Route AUR packages through yay, everything else through the distro pkg manager
+        let use_yay = matches!(pkg_mgr, PackageManager::Pacman | PackageManager::Yay) && is_aur(pkg);
+
+        let status = if use_yay {
+            Command::new("yay")
                 .args(["-S", "--needed", "--noconfirm", pkg])
                 .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status(),
-            PackageManager::Dnf => Command::new("sudo")
-                .args(["dnf", "install", "-y", pkg])
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status(),
-            PackageManager::Zypper => Command::new("sudo")
-                .args(["zypper", "install", "-y", "--no-confirm", pkg])
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status(),
-            PackageManager::Xbps => Command::new("sudo")
-                .args(["xbps-install", "-Sy", pkg])
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .status(),
+                .stderr(stderr_sink)
+                .status()
+        } else {
+            match pkg_mgr {
+                PackageManager::Pacman | PackageManager::Yay => Command::new("sudo")
+                    .args(["pacman", "-S", "--needed", "--noconfirm", pkg])
+                    .stdout(Stdio::null())
+                    .stderr(stderr_sink)
+                    .status(),
+                PackageManager::Dnf => Command::new("sudo")
+                    .args(["dnf", "install", "-y", pkg])
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status(),
+                PackageManager::Zypper => Command::new("sudo")
+                    .args(["zypper", "install", "-y", "--no-confirm", pkg])
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status(),
+                PackageManager::Xbps => Command::new("sudo")
+                    .args(["xbps-install", "-Sy", pkg])
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status(),
+            }
         };
 
         let result = match status {
             Ok(s) if s.success() => InstallResult::Ok,
-            Ok(s) => InstallResult::Failed(
-                format!("exited with code {}", s.code().unwrap_or(-1))
-            ),
-            Err(e) => InstallResult::Failed(
-                format!("failed to launch: {}", e)
-            ),
+            Ok(s) => InstallResult::Failed(format!("exited with code {}", s.code().unwrap_or(-1))),
+            Err(e) => InstallResult::Failed(format!("failed to launch: {}", e)),
         };
 
         results.push((pkg.to_string(), result));
