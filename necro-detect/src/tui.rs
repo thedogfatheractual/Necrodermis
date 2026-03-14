@@ -553,6 +553,193 @@ fn draw_left_manifest(f: &mut Frame, area: Rect, app: &App) {
 
 // ── Right panes ───────────────────────────────────────────────────────────────
 
+// ── Component lore ───────────────────────────────────────────────────────────
+
+struct Lore { pub title: &'static str, pub body: &'static [&'static str] }
+
+const PKG_LORE: &[(&str, Lore)] = &[
+    ("hyprland", Lore { title: "CANOPTEK SHELL",  body: &[
+        "The living metal compositor.",
+        "Wayland surfaces rendered",
+        "through quantum-phase tiling.",
+        "",
+        "No X11. No compromise.",
+        "The tomb does not run legacy",
+        "protocols.",
+    ]}),
+    ("hyprlock", Lore { title: "STASIS LOCK", body: &[
+        "A dynastic encryption seal.",
+        "The screen dims. The cortex",
+        "enters low-power stasis.",
+        "",
+        "Biometric glyphs required",
+        "to break the seal.",
+        "Canoptek sentinels watch.",
+    ]}),
+    ("waybar",   Lore { title: "SIGNAL ARRAY", body: &[
+        "Tomb-world telemetry bar.",
+        "Broadcasts system vitals",
+        "across the upper cortex.",
+        "",
+        "Workspaces. Clock. Network.",
+        "All data flows through here.",
+        "The array does not sleep.",
+    ]}),
+    ("rofi",     Lore { title: "TOMB INTERFACE", body: &[
+        "The command invocation rite.",
+        "Speak a designation and the",
+        "construct materialises.",
+        "",
+        "Sub-1ms response latency.",
+        "Necron UI. No mouse required.",
+        "Thought becomes action.",
+    ]}),
+    ("kitty",    Lore { title: "CORTEX NODE", body: &[
+        "GPU-accelerated terminal.",
+        "Text rendered at the speed",
+        "of living metal thought.",
+        "",
+        "Background image. Ligatures.",
+        "The Necrodermis warrior",
+        "watches from behind the shell.",
+    ]}),
+    ("fish",     Lore { title: "COMMAND DIALECT", body: &[
+        "The tongue of the tomb world.",
+        "Syntax highlighting. History.",
+        "Autosuggestions from the",
+        "Eternity Gate archives.",
+        "",
+        "Bash is organic. Fish is not.",
+    ]}),
+    ("swaync",   Lore { title: "CANOPTEK ALERTS", body: &[
+        "Notification scarabs.",
+        "Small constructs that carry",
+        "messages from the network",
+        "to the operator's attention.",
+        "",
+        "Dismissed with a gesture.",
+        "They do not linger.",
+    ]}),
+    ("gtk",      Lore { title: "DERMAL SKIN", body: &[
+        "The outermost living layer.",
+        "GTK applications coated in",
+        "Necrodermis chrome.",
+        "",
+        "nwg-look applies the pigment.",
+        "Every dialog. Every button.",
+        "All bearing the tomb aesthetic.",
+    ]}),
+    ("walls",    Lore { title: "TOMB MURALS", body: &[
+        "Hieroglyphic wallpapers.",
+        "Necron warriors rendered in",
+        "deep obsidian and pale gold.",
+        "",
+        "Applied by config scripts.",
+        "The tomb does not display",
+        "organic landscapes.",
+    ]}),
+    ("btop",     Lore { title: "PROCESS CRYPT", body: &[
+        "The process overseer.",
+        "Every thread visible.",
+        "Every memory allocation",
+        "catalogued and judged.",
+        "",
+        "Organic processes that waste",
+        "cycles will be... noticed.",
+    ]}),
+    ("sddm",     Lore { title: "AWAKENING GATE", body: &[
+        "The resurrection threshold.",
+        "Each boot, the operator",
+        "passes through the gate.",
+        "",
+        "Necrodermis login screen.",
+        "Credentials verified by the",
+        "Eternity Gate protocols.",
+    ]}),
+    ("grub",     Lore { title: "BOOT SEQUENCE", body: &[
+        "The pre-awakening ritual.",
+        "GRUB themed in tomb-world",
+        "glyphs and deep black.",
+        "",
+        "Applied by config scripts.",
+        "The silent countdown before",
+        "the cortex regains function.",
+    ]}),
+    ("ufw",      Lore { title: "PERIMETER WARD", body: &[
+        "Defensive energy barrier.",
+        "Incoming connections assessed",
+        "and denied by default.",
+        "",
+        "The tomb world is not open",
+        "to unsolicited intrusion.",
+        "The Ward enforces this.",
+    ]}),
+    ("kernel",   Lore { title: "CORTEX LOCK", body: &[
+        "Hardening the neural core.",
+        "sysctl parameters tightened.",
+        "Attack surface reduced.",
+        "",
+        "Applied via config scripts.",
+        "The living metal does not",
+        "expose unnecessary vectors.",
+    ]}),
+    ("sitrep",   Lore { title: "ATMOSPHERIC DATA", body: &[
+        "Tomb-world weather station.",
+        "METAR feeds decoded and",
+        "rendered in the terminal.",
+        "",
+        "Installed via config scripts.",
+        "The Silent King tracks all",
+        "atmospheric conditions.",
+    ]}),
+    ("brave",    Lore { title: "COMMS RELAY", body: &[
+        "External network interface.",
+        "The wider web accessed",
+        "through hardened chromium.",
+        "",
+        "Ad blocking built in.",
+        "The tomb does not watch",
+        "organic advertisements.",
+    ]}),
+    ("vesktop",  Lore { title: "DYNASTY COMMS", body: &[
+        "Inter-dynasty communication.",
+        "Voice and text channels",
+        "with other tomb worlds.",
+        "",
+        "Vesktop — Discord without",
+        "the unnecessary telemetry.",
+        "The Necrons value privacy.",
+    ]}),
+];
+
+fn pkg_lore(id: &str) -> Option<&'static Lore> {
+    PKG_LORE.iter().find(|(k, _)| *k == id).map(|(_, v)| v)
+}
+
+fn draw_right_lore(f: &mut Frame, area: Rect, id: &str, active: bool) {
+    let lore = pkg_lore(id);
+    let title_sty = if active { hi() } else { wh() };
+    let mut lines = vec![
+        Line::from(Span::styled("CONSTRUCT DATA", wh())),
+        sep_line(area.width),
+        Line::from(""),
+    ];
+    if let Some(l) = lore {
+        lines.push(Line::from(Span::styled(l.title, title_sty)));
+        lines.push(Line::from(""));
+        for line in l.body {
+            lines.push(Line::from(Span::styled(*line, if line.is_empty() { dim() } else { wh2() })));
+        }
+    } else {
+        lines.push(Line::from(Span::styled(id, title_sty)));
+        lines.push(Line::from(""));
+        lines.push(Line::from(Span::styled("No construct data", dim())));
+        lines.push(Line::from(Span::styled("in the Eternity Gate", dim())));
+        lines.push(Line::from(Span::styled("archives.", dim())));
+    }
+    f.render_widget(Paragraph::new(lines).style(blk()), area);
+}
+
 fn draw_right_splash(f: &mut Frame, area: Rect) {
     let lines = vec![
         Line::from(Span::styled("OPERATOR CLEARANCE", wh())),
@@ -561,17 +748,15 @@ fn draw_right_splash(f: &mut Frame, area: Rect) {
         Line::from(Span::styled("sudo required", amb())),
         Line::from(Span::styled("Have password ready.", wh2())),
         Line::from(""),
-        Line::from(Span::styled("Do not leave the", wh2())),
-        Line::from(Span::styled("terminal unattended.", wh2())),
-        Line::from(""),
-        Line::from(Span::styled("Root access is a", wh2())),
-        Line::from(Span::styled("weapon — wield it", wh2())),
-        Line::from(Span::styled("with intent.", wh2())),
+        Line::from(Span::styled("The tomb requires", wh2())),
+        Line::from(Span::styled("elevated permissions", wh2())),
+        Line::from(Span::styled("to graft the", wh2())),
+        Line::from(Span::styled("Necrodermis layer.", wh2())),
         Line::from(""),
         sep_line(area.width),
         Line::from(Span::styled("The Silent King did", dim())),
-        Line::from(Span::styled("not survive 60M yrs", dim())),
-        Line::from(Span::styled("by being careless.", dim())),
+        Line::from(Span::styled("not survive 60 million", dim())),
+        Line::from(Span::styled("years by being careless.", dim())),
     ];
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
@@ -602,21 +787,7 @@ fn draw_right_mode(f: &mut Frame, area: Rect, app: &App) {
 
 fn draw_right_picker(f: &mut Frame, area: Rect, app: &App) {
     let entry = &app.packages[app.pkg_cursor];
-    let sel   = app.packages.iter().filter(|p| p.selected).count();
-    let lines = vec![
-        Line::from(Span::styled("COMPONENT INFO", wh())),
-        sep_line(area.width),
-        Line::from(""),
-        Line::from(Span::styled(entry.necron.as_str(), hi())),
-        Line::from(Span::styled(entry.desc.as_str(), wh2())),
-        Line::from(""),
-        sep_line(area.width),
-        Line::from(vec![
-            Span::styled(format!("{}", sel), g()),
-            Span::styled(format!("/{} selected", app.packages.len()), wh2()),
-        ]),
-    ];
-    f.render_widget(Paragraph::new(lines).style(blk()), area);
+    draw_right_lore(f, area, &entry.id.clone(), true);
 }
 
 fn draw_right_confirm(f: &mut Frame, area: Rect, app: &App) {
@@ -626,47 +797,38 @@ fn draw_right_confirm(f: &mut Frame, area: Rect, app: &App) {
         Line::from(Span::styled("MANIFEST SUMMARY", wh())),
         sep_line(area.width),
         Line::from(""),
-        Line::from(vec![Span::styled(format!("{}", sel), hi()), Span::styled(" components", wh2())]),
+        Line::from(vec![Span::styled(format!("{}", sel), hi()), Span::styled(" to install", wh2())]),
         Line::from(vec![Span::styled(format!("{}", total - sel), wh2()), Span::styled(" skipped", dim())]),
         Line::from(""),
         sep_line(area.width),
-        Line::from(Span::styled("SUDO REQUIRED", amb())),
+        Line::from(Span::styled("sudo required", amb())),
         Line::from(""),
-        Line::from(Span::styled("Stay at terminal", wh2())),
-        Line::from(Span::styled("during installation.", wh2())),
+        Line::from(Span::styled("Stay at terminal.", wh2())),
+        Line::from(Span::styled("The awakening", wh2())),
+        Line::from(Span::styled("sequence cannot be", wh2())),
+        Line::from(Span::styled("interrupted.", wh2())),
     ];
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
 fn draw_right_stages(f: &mut Frame, area: Rect, app: &App) {
-    let selected: Vec<&PkgEntry> = app.packages.iter().filter(|p| p.selected).collect();
-    let done = selected.iter().filter(|p| matches!(p.status, PkgStatus::Ok | PkgStatus::Skipped | PkgStatus::Failed)).count();
-    let mut lines = vec![
-        Line::from(vec![
-            Span::styled("STAGE STATUS ", wh()),
-            Span::styled(format!("[{}/{}]", done, selected.len()), wh2()),
-        ]),
-        sep_line(area.width),
-    ];
-    for entry in &selected {
-        let (icon, col) = match entry.status {
-            PkgStatus::Active  => ("►", Color::Rgb(0, 204, 0)),
-            PkgStatus::Ok      => ("✓", Color::Rgb(0, 170, 0)),
-            PkgStatus::Failed  => ("✗", Color::Rgb(136, 0, 0)),
-            PkgStatus::Skipped => ("·", Color::Rgb(136, 102, 0)),
-            PkgStatus::Pending => ("·", Color::Rgb(26, 60, 26)),
-        };
-        let nsty = match entry.status { PkgStatus::Pending => dim(), _ => Style::default().fg(col) };
-        lines.push(Line::from(vec![
-            Span::styled(format!("{} ", icon), Style::default().fg(col)),
-            Span::styled(entry.necron.as_str(), nsty),
-        ]));
+    // show lore for the currently active package, fall back to last ok
+    let active_id = app.packages.iter()
+        .find(|p| p.status == PkgStatus::Active)
+        .or_else(|| app.packages.iter().filter(|p| p.status == PkgStatus::Ok).last())
+        .map(|p| p.id.clone());
+    if let Some(id) = active_id {
+        draw_right_lore(f, area, &id, true);
+    } else {
+        let lines = vec![
+            Line::from(Span::styled("CONSTRUCT DATA", wh())),
+            sep_line(area.width),
+            Line::from(""),
+            Line::from(Span::styled("Awaiting first", dim())),
+            Line::from(Span::styled("construct activation.", dim())),
+        ];
+        f.render_widget(Paragraph::new(lines).style(blk()), area);
     }
-    if app.screen == Screen::Codex {
-        lines.push(sep_line(area.width));
-        lines.push(Line::from(Span::styled("SEQUENCE COMPLETE", hi())));
-    }
-    f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
 
 fn draw_right_nextsteps(f: &mut Frame, area: Rect) {
@@ -681,7 +843,7 @@ fn draw_right_nextsteps(f: &mut Frame, area: Rect) {
         Line::from(vec![Span::styled("3 ", teal()), Span::styled("Run: sitrep", wh2())]),
         Line::from(""),
         Line::from(vec![Span::styled("4 ", teal()), Span::styled("necrodermis-uninstall", wh2())]),
-        Line::from(vec![Span::styled("  ", dim()), Span::styled("to revert", wh2())]),
+        Line::from(vec![Span::styled("  ", dim()),  Span::styled("to revert", wh2())]),
         Line::from(""),
         sep_line(area.width),
         Line::from(Span::styled("Q/ENT  exit", dim())),
@@ -689,6 +851,7 @@ fn draw_right_nextsteps(f: &mut Frame, area: Rect) {
     ];
     f.render_widget(Paragraph::new(lines).style(blk()), area);
 }
+
 
 // ── Centre panes ──────────────────────────────────────────────────────────────
 
