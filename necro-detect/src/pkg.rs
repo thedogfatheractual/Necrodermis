@@ -27,27 +27,50 @@ pub fn is_aur(pkg: &str) -> bool {
 
 /// Ensure yay is available. If not, bootstrap it from AUR via git + makepkg.
 /// Returns true if yay is usable after this call.
+/// IMPORTANT: all output is suppressed — this runs inside the TUI (raw mode active).
 pub fn ensure_yay() -> bool {
     // Already installed?
-    if Command::new("which").arg("yay").output().map(|o| o.status.success()).unwrap_or(false) {
+    if Command::new("which").arg("yay")
+        .stdout(Stdio::null()).stderr(Stdio::null())
+        .output().map(|o| o.status.success()).unwrap_or(false)
+    {
         return true;
     }
-    // Try to build it
-    let log = OpenOptions::new().create(true).append(true)
-        .open("/tmp/necrodermis-install.log").ok().map(Stdio::from);
-    let stderr = log.unwrap_or_else(Stdio::null);
-    let ok = Command::new("bash")
-        .args(["-c",
-            "cd /tmp && rm -rf yay-bin && \
-             git clone https://aur.archlinux.org/yay-bin.git && \
-             cd yay-bin && makepkg -si --noconfirm"
-        ])
+
+    let log_path = "/tmp/necrodermis-install.log";
+
+    // git clone — all output to log
+    let clone_ok = Command::new("git")
+        .args(["clone", "--depth=1",
+               "https://aur.archlinux.org/yay-bin.git",
+               "/tmp/necrodermis-yay-bin"])
+        .stdin(Stdio::null())
         .stdout(Stdio::null())
-        .stderr(stderr)
+        .stderr(OpenOptions::new().create(true).append(true)
+            .open(log_path).ok().map(Stdio::from).unwrap_or_else(Stdio::null))
         .status()
         .map(|s| s.success())
         .unwrap_or(false);
-    ok
+
+    if !clone_ok { return false; }
+
+    // makepkg -si --noconfirm — all output to log, stdin null (no prompts)
+    let build_ok = Command::new("makepkg")
+        .args(["-si", "--noconfirm"])
+        .current_dir("/tmp/necrodermis-yay-bin")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(OpenOptions::new().create(true).append(true)
+            .open(log_path).ok().map(Stdio::from).unwrap_or_else(Stdio::null))
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+
+    // Cleanup regardless
+    let _ = Command::new("rm").args(["-rf", "/tmp/necrodermis-yay-bin"])
+        .stdout(Stdio::null()).stderr(Stdio::null()).status();
+
+    build_ok
 }
 
 pub fn build_pkg_map() -> HashMap<String, String> {
